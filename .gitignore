@@ -14,7 +14,6 @@ nbproject/*
 #idea specific
 idea
 .idea/
-.idea/*
 *.iml
 *.ipr
 *.iws
@@ -31,7 +30,7 @@ target/
 *.DS_Store
 *.lock
 *.sh
-*.txt.*
+texts/output/input.txt.xml
 .directory
 
 
