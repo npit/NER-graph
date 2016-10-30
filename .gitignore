@@ -30,7 +30,6 @@ target/
 *.DS_Store
 *.lock
 *.sh
-texts/output/input.txt.xml
 .directory
 
 
