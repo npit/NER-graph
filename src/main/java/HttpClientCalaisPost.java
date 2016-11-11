@@ -5,12 +5,20 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import java.io.*;
 
 public class HttpClientCalaisPost {
-
     private static final String CALAIS_URL = "https://api.thomsonreuters.com/permid/calais";
-    private static String uniqueAccessKey;
+    private String uniqueAccessKey;
     private File input;
     private File output;
     private HttpClient client;
+
+    public HttpClientCalaisPost(String input, String output, String apiKey) {
+        this.input = new File(input);
+        this.output = new File(output);
+        this.uniqueAccessKey = apiKey;
+
+        this.client = new HttpClient();
+        this.client.getParams().setParameter("http.useragent", "Calais Rest Client");
+    }
 
     private PostMethod createPostMethod() {
         PostMethod method = new PostMethod(CALAIS_URL);
@@ -24,7 +32,7 @@ public class HttpClientCalaisPost {
         return method;
     }
 
-    private void run() {
+    public void run() {
         try {
             if (input.isFile()) {
                 postFile(input, createPostMethod());
@@ -69,7 +77,7 @@ public class HttpClientCalaisPost {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     method.getResponseBodyAsStream(), "UTF-8"));
-            File out = new File(output, file.getName() + ".xml");
+            File out = new File(output, file.getName() + ".json");
             writer = new PrintWriter(new BufferedWriter(new FileWriter(out)));
             String line;
             while ((line = reader.readLine()) != null) {
@@ -87,34 +95,34 @@ public class HttpClientCalaisPost {
         doRequest(file, method);
     }
 
-    public static void main(String[] args) {
-        verifyArgs(args);
-        HttpClientCalaisPost httpClientPost = new HttpClientCalaisPost();
-        httpClientPost.input = new File(args[0]);
-        httpClientPost.output = new File(args[1]);
-        httpClientPost.client = new HttpClient();
-        httpClientPost.client.getParams().setParameter("http.useragent", "Calais Rest Client");
-        httpClientPost.run();
-    }
+//    public static void main(String[] args) {
+//        verifyArgs(args);
+//        HttpClientCalaisPost httpClientPost = new HttpClientCalaisPost();
+//        httpClientPost.input = new File(args[0]);
+//        httpClientPost.output = new File(args[1]);
+//        httpClientPost.client = new HttpClient();
+//        httpClientPost.client.getParams().setParameter("http.useragent", "Calais Rest Client");
+//        httpClientPost.run();
+//    }
 
-    private static void verifyArgs(String[] args) {
-        if (args.length==0) {
-            usageError("no params supplied");
-        } else if (args.length < 3) {
-            usageError("3 params are required");
-        } else {
-            if (!new File(args[0]).exists())
-                usageError("file " + args[0] + " doesn't exist");
-            File outdir = new File(args[1]);
-            if (!outdir.exists() && !outdir.mkdirs())
-                usageError("couldn't create output dir");
-        }
-        uniqueAccessKey = args[2];
-    }
+//    private static void verifyArgs(String[] args) {
+//        if (args.length==0) {
+//            usageError("no params supplied");
+//        } else if (args.length < 3) {
+//            usageError("3 params are required");
+//        } else {
+//            if (!new File(args[0]).exists())
+//                usageError("file " + args[0] + " doesn't exist");
+//            File outdir = new File(args[1]);
+//            if (!outdir.exists() && !outdir.mkdirs())
+//                usageError("couldn't create output dir");
+//        }
+//        uniqueAccessKey = args[2];
+//    }
 
-    private static void usageError(String s) {
-        System.err.println(s);
-        System.err.println("Usage: java " + (new Object() { }.getClass().getEnclosingClass()).getName() + " input_dir output_dir");
-        System.exit(-1);
-    }
+//    private static void usageError(String s) {
+//        System.err.println(s);
+//        System.err.println("Usage: java " + (new Object() { }.getClass().getEnclosingClass()).getName() + " input_dir output_dir");
+//        System.exit(-1);
+//    }
 }
