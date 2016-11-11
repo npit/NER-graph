@@ -1,3 +1,5 @@
+package entity_extractor;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
@@ -6,10 +8,10 @@ import java.io.*;
 
 public class HttpClientCalaisPost {
     private static final String CALAIS_URL = "https://api.thomsonreuters.com/permid/calais";
-    private String uniqueAccessKey;
-    private File input;
-    private File output;
-    private HttpClient client;
+    private final String uniqueAccessKey;
+    private final File input;
+    private final File output;
+    private final HttpClient client;
 
     public HttpClientCalaisPost(String input, String output, String apiKey) {
         this.input = new File(input);
@@ -72,7 +74,7 @@ public class HttpClientCalaisPost {
         }
     }
 
-    private void saveResponse(File file, PostMethod method) throws IOException {
+    private void saveResponse(File file, PostMethod method) {
         PrintWriter writer = null;
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -90,39 +92,8 @@ public class HttpClientCalaisPost {
         }
     }
 
-    private void postFile(File file, PostMethod method) throws IOException {
+    private void postFile(File file, PostMethod method) {
         method.setRequestEntity(new FileRequestEntity(file, null));
         doRequest(file, method);
     }
-
-//    public static void main(String[] args) {
-//        verifyArgs(args);
-//        HttpClientCalaisPost httpClientPost = new HttpClientCalaisPost();
-//        httpClientPost.input = new File(args[0]);
-//        httpClientPost.output = new File(args[1]);
-//        httpClientPost.client = new HttpClient();
-//        httpClientPost.client.getParams().setParameter("http.useragent", "Calais Rest Client");
-//        httpClientPost.run();
-//    }
-
-//    private static void verifyArgs(String[] args) {
-//        if (args.length==0) {
-//            usageError("no params supplied");
-//        } else if (args.length < 3) {
-//            usageError("3 params are required");
-//        } else {
-//            if (!new File(args[0]).exists())
-//                usageError("file " + args[0] + " doesn't exist");
-//            File outdir = new File(args[1]);
-//            if (!outdir.exists() && !outdir.mkdirs())
-//                usageError("couldn't create output dir");
-//        }
-//        uniqueAccessKey = args[2];
-//    }
-
-//    private static void usageError(String s) {
-//        System.err.println(s);
-//        System.err.println("Usage: java " + (new Object() { }.getClass().getEnclosingClass()).getName() + " input_dir output_dir");
-//        System.exit(-1);
-//    }
 }

@@ -1,3 +1,5 @@
+import entity_extractor.HttpClientCalaisPost;
+
 import java.util.ArrayList;
 
 public class NamedEntityGraph {
