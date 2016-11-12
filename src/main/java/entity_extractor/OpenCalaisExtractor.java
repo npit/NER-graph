@@ -8,18 +8,31 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class OpenCalaisExtractor implements EntityExtractor {
     private static final String CALAIS_URL = "https://api.thomsonreuters.com/permid/calais";
     private static final boolean enableCache = true;
+
+    private static final String outputFolder = "texts/output";
+    private final ArrayList<String> apiKeys;
 
     private String uniqueAccessKey;
     private File output;
     private HttpClient client;
 
     public OpenCalaisExtractor() {
+        // Setup client
         this.client = new HttpClient();
         this.client.getParams().setParameter("http.useragent", "Calais Rest Client");
+
+        // Setup api keys
+        apiKeys = new ArrayList<>();
+        apiKeys.add("***REMOVED***");
+        this.uniqueAccessKey = apiKeys.get(0);
+
+        // Setup cache/output folder
+        this.output = new File(this.outputFolder);
     }
 
     private PostMethod createPostMethod() {
@@ -109,7 +122,7 @@ public class OpenCalaisExtractor implements EntityExtractor {
     }
 
     /**
-     * Turn an OpenCalais JSON response string into a TextEntities object
+     * Parse the OpenCalais JSON response string into a TextEntities object
      * @param ocResponse    Response string
      * @return              Text entities
      */
