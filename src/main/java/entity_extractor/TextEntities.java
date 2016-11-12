@@ -6,13 +6,28 @@ import java.util.ArrayList;
  * Entities extracted from a text
  */
 public class TextEntities {
-    ArrayList<String> entities;
+    private ArrayList<ExtractedEntity> entities;
+    private String text;
 
-    public ArrayList<String> getEntities() {
+    public TextEntities(String text) {
+        this.text = text;
+
+        this.entities = new ArrayList<>();
+    }
+
+    public void addEntity(ExtractedEntity e) {
+        this.entities.add(e);
+    }
+
+    public ArrayList<ExtractedEntity> getEntities() {
         return entities;
     }
 
-    public void setEntities(ArrayList<String> entities) {
-        this.entities = entities;
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }
