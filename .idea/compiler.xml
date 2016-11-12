@@ -22,11 +22,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="OpenCalaisTest3" />
+        <module name="NamedEntityGraph" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="OpenCalaisTest3" target="1.5" />
+      <module name="NamedEntityGraph" target="1.7" />
     </bytecodeTargetLevel>
   </component>
 </project>
