@@ -18,8 +18,11 @@ public class NamedEntityGraph {
                 for (File file : input.listFiles()) {
                     if (file.isFile()) {
                         System.out.println("[main] Getting entities for " + file);
+
                         TextEntities entities = entityExtractor.getEntities(file);
-                        System.out.println("[main] Got extracted entities for " + file);
+                        entities.printEntities();
+
+                        System.out.println("[main] Got " + entities.getEntities().size() + " extracted entities from " + file);
                     } else {
                         System.out.println("skipping "+file.getAbsolutePath());
                     }

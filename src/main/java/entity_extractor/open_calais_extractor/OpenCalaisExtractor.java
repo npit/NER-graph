@@ -7,6 +7,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -148,7 +149,7 @@ public class OpenCalaisExtractor implements EntityExtractor {
             JSONObject tag = obj.getJSONObject(tagID);
 
             // Check that object has at least the basic properties that we need to continue
-            if (!tag.has("_typeGroup") || !tag.has("name") || !tag.has("_type")) {
+            if (!tag.has("_typeGroup") || !tag.has("name") || !tag.has("_type") || !tag.has("instances")) {
                 continue;
             }
 
@@ -157,14 +158,40 @@ public class OpenCalaisExtractor implements EntityExtractor {
             if (!typeGroup.equals("entities"))
                 continue;
 
-            // Initialize entity
-            ExtractedEntity entity = new ExtractedEntity();
+            // Skip tags that not for end user display
+//            if (tag.getString("forenduserdisplay").equals("false")) {
+//                continue;
+//            }
 
-            entity.setName(tag.getString("name"));
-            entity.setType(tag.getString("_type"));
-            System.out.println(entity);
+            // Get all of this entity's instances
+            JSONArray instances = tag.getJSONArray("instances");
 
-            entities.addEntity(entity);
+            for (Object instance : instances) {
+                // Check that the object is indeed a JSONObject before casting it
+                if (!(instance instanceof JSONObject)) {
+                    System.err.println("Instance is not a JSONObject! Skipping it...");
+                    continue;
+                }
+
+                // Cast instance to a JSONObject to continue
+                JSONObject i = (JSONObject)instance;
+
+                if (!i.has("offset") || !i.has("length")) {
+                    System.err.println("Instance does not have offset or length! Skipping it...");
+                    continue;
+                }
+
+                // Initialize entity for this instance and add the required properties to it
+                ExtractedEntity entity = new ExtractedEntity();
+
+//                entity.setName(i.getString("exact"));
+                entity.setName(tag.getString("name"));
+                entity.setType(tag.getString("_type"));
+                entity.setOffset(i.getInt("offset"));
+                entity.setLength(i.getInt("length"));
+
+                entities.addEntity(entity);
+            }
         }
 
         return entities;
