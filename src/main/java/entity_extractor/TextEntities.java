@@ -28,4 +28,10 @@ public class TextEntities {
     public void setText(String text) {
         this.text = text;
     }
+
+    public void printEntities() {
+        for (ExtractedEntity e : entities) {
+            System.out.println(e);
+        }
+    }
 }
