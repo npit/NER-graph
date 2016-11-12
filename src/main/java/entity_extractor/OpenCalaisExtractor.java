@@ -12,12 +12,11 @@ import java.util.ArrayList;
 
 public class OpenCalaisExtractor implements EntityExtractor {
     private static final String CALAIS_URL = "https://api.thomsonreuters.com/permid/calais";
-    private static final boolean enableCache = true;
 
     private static final String outputFolder = "texts/output";
-    private final ArrayList<String> apiKeys;
+    private static final boolean enableCache = true;
 
-    private String uniqueAccessKey;
+    private final ArrayList<String> apiKeys;
     private File output;
     private HttpClient client;
 
@@ -29,16 +28,15 @@ public class OpenCalaisExtractor implements EntityExtractor {
         // Setup api keys
         apiKeys = new ArrayList<>();
         apiKeys.add("***REMOVED***");
-        this.uniqueAccessKey = apiKeys.get(0);
 
         // Setup cache/output folder
-        this.output = new File(this.outputFolder);
+        this.output = new File(outputFolder);
     }
 
     private PostMethod createPostMethod() {
         PostMethod method = new PostMethod(CALAIS_URL);
 
-        method.setRequestHeader("X-AG-Access-Token", uniqueAccessKey);  // Set mandatory parameters
+        method.setRequestHeader("X-AG-Access-Token", apiKeys.get(0));   // Set mandatory parameters
         method.setRequestHeader("Content-Type", "text/raw");            // Set input content type
         method.setRequestHeader("outputformat", "application/json");    // Set response/output format
 
@@ -129,14 +127,6 @@ public class OpenCalaisExtractor implements EntityExtractor {
     private TextEntities getEntitiesFromOpenCalaisResponse(String ocResponse) {
 
         return new TextEntities();
-    }
-
-    public void setApiKey(String apiKey) {
-        this.uniqueAccessKey = apiKey;
-    }
-
-    public void setOutputDir(File dir) {
-        this.output = dir;
     }
 
     public TextEntities getEntities(File input) {
