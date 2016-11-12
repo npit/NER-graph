@@ -25,7 +25,7 @@
         <module name="NamedEntityGraph" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="1.7">
       <module name="NamedEntityGraph" target="1.7" />
     </bytecodeTargetLevel>
   </component>
