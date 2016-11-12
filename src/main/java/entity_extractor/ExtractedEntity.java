@@ -50,4 +50,10 @@ public class ExtractedEntity {
     public void setLength(int length) {
         this.length = length;
     }
+
+    @Override
+    public String toString() {
+        return "[Entity] name: " + this.name + " | type: " + this.type + " | " +
+                "offset: " + this.offset + " | length: " + this.length;
+    }
 }
