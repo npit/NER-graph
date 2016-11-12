@@ -1,16 +1,19 @@
 package entity_extractor.open_calais_extractor;
 
 import entity_extractor.EntityExtractor;
+import entity_extractor.ExtractedEntity;
 import entity_extractor.TextEntities;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class OpenCalaisExtractor implements EntityExtractor {
     private static final String CALAIS_URL = "https://api.thomsonreuters.com/permid/calais";
@@ -122,13 +125,49 @@ public class OpenCalaisExtractor implements EntityExtractor {
     }
 
     /**
-     * Parse the OpenCalais JSON response string into a TextEntities object
-     * @param ocResponse    Response string
+     * Parse the OpenCalais JSON response string into a ArrayList<ExtractedEntity> object
+     * @param responseStr    Response string
      * @return              Text entities
      */
-    private TextEntities getEntitiesFromOpenCalaisResponse(String ocResponse) {
+    private TextEntities getEntitiesFromOpenCalaisResponse(String responseStr) {
+        TextEntities entities = new TextEntities();
+        JSONObject obj = new JSONObject(responseStr);
 
-        return new TextEntities();
+        // Get the document text from the response
+        String text = obj.getJSONObject("doc").getJSONObject("info").getString("document");
+        entities.setText(text);
+
+        // Get entities
+        Iterator<String> tags = obj.keys();
+        while(tags.hasNext()) {
+            String tagID = tags.next();
+
+            if (tagID.equals("doc"))
+                continue;
+
+            JSONObject tag = obj.getJSONObject(tagID);
+
+            // Check that object has at least the basic properties that we need to continue
+            if (!tag.has("_typeGroup") || !tag.has("name") || !tag.has("_type")) {
+                continue;
+            }
+
+            // If object is not of type "entities", ignore it as we only want entities
+            String typeGroup = tag.getString("_typeGroup");
+            if (!typeGroup.equals("entities"))
+                continue;
+
+            // Initialize entity
+            ExtractedEntity entity = new ExtractedEntity();
+
+            entity.setName(tag.getString("name"));
+            entity.setType(tag.getString("_type"));
+            System.out.println(entity);
+
+            entities.addEntity(entity);
+        }
+
+        return entities;
     }
 
     public TextEntities getEntities(File input) {
@@ -145,8 +184,6 @@ public class OpenCalaisExtractor implements EntityExtractor {
             System.out.println("no");
             response = postFile(input, createPostMethod());
         }
-
-        System.out.println("Response: " + response);
 
         return getEntitiesFromOpenCalaisResponse(response);
     }
