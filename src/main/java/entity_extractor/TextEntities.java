@@ -9,9 +9,7 @@ public class TextEntities {
     private ArrayList<ExtractedEntity> entities;
     private String text;
 
-    public TextEntities(String text) {
-        this.text = text;
-
+    public TextEntities() {
         this.entities = new ArrayList<>();
     }
 
