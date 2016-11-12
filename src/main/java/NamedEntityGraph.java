@@ -1,5 +1,5 @@
 import entity_extractor.EntityExtractor;
-import entity_extractor.OpenCalaisExtractor;
+import entity_extractor.open_calais_extractor.OpenCalaisExtractor;
 import entity_extractor.TextEntities;
 
 import java.io.File;
