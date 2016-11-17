@@ -22,11 +22,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="NamedEntityGraph" />
+        <module name="com.leo.namedentitygraph" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="1.7">
-      <module name="NamedEntityGraph" target="1.7" />
+    <bytecodeTargetLevel>
+      <module name="com.leo.namedentitygraph" target="1.7" />
     </bytecodeTargetLevel>
   </component>
 </project>
