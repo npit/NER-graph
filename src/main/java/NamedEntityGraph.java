@@ -10,14 +10,22 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class NamedEntityGraph {
+    private static ArrayList<String> dummyWords;
+
     public static void main(String[] args) {
         // Main variables
         String inputFolder = "texts/input";
 
+        dummyWords = new ArrayList<>();
+        dummyWords.add(".");
+//        dummyWords.add("");
+//        dummyWords.add("-");
+//        dummyWords.add("WOW");
+        dummyWords.add("A");
+
         File input = new File(inputFolder);
         EntityExtractor entityExtractor = new OpenCalaisExtractor();
-        ArrayList<DocumentWordGraph> entityGraphs = new ArrayList<>();
-        ArrayList<DocumentNGramGraph> nGramGraphs = new ArrayList<>();
+        ArrayList<TextEntities> texts = new ArrayList<>();
 
         try {
             if (input.isDirectory()) {
@@ -29,20 +37,7 @@ public class NamedEntityGraph {
                         TextEntities entities = entityExtractor.getEntities(file);
 //                        entities.printEntities();
 
-                        String entityText = entities.getEntityText();
-                        System.out.println(entityText);
-
-                        // Create entity word graph
-                        DocumentWordGraph wordGraph = new DocumentWordGraph();
-                        wordGraph.setDataString(entityText);
-
-                        entityGraphs.add(wordGraph);
-
-                        // Create normal n-gram graph
-                        DocumentNGramGraph nGramGraph = new DocumentWordGraph();
-                        nGramGraph.setDataString(entities.getText());
-
-                        nGramGraphs.add(nGramGraph);
+                        texts.add(entities);
 
                         System.out.println("[main] Got " + entities.getEntities().size() + " extracted entities from " + file + "\n");
                     } else {
@@ -54,30 +49,37 @@ public class NamedEntityGraph {
             e.printStackTrace();
         }
 
+        compareTexts(texts.get(0), texts.get(1));
+    }
+
+    private static void compareTexts(TextEntities text1, TextEntities text2) {
         // Create comparator object
         NGramCachedGraphComparator comparator = new NGramCachedGraphComparator();
 
-        // Compare 2 first entity graphs
-        if (entityGraphs.size() >= 2) {
-            // Get graphs to compare
-            DocumentWordGraph entityGraph1 = entityGraphs.get(0);
-            DocumentWordGraph entityGraph2 = entityGraphs.get(1);
+        // Compare with n-gram graphs
+        DocumentNGramGraph nGramGraph1 = new DocumentWordGraph();
+        nGramGraph1.setDataString(text1.getText());
 
-            // Get similarity of graphs
-            GraphSimilarity entitySimilarity = comparator.getSimilarityBetween(entityGraph1, entityGraph2);
+        DocumentNGramGraph nGramGraph2 = new DocumentWordGraph();
+        nGramGraph2.setDataString(text2.getText());
 
-            System.out.println("Named Entity Graph similarity:\t" + entitySimilarity.toString());
-        }
+        GraphSimilarity nGramSimilarity = comparator.getSimilarityBetween(nGramGraph1, nGramGraph2);
 
-        // Compare 2 first n-gram graphs
-        if (nGramGraphs.size() >= 2) {
-            DocumentNGramGraph nGramGraph1 = nGramGraphs.get(0);
-            DocumentNGramGraph nGramGraph2 = nGramGraphs.get(1);
+        System.out.println("N-gram similarity:\t\t" + nGramSimilarity.toString());
 
-            // Get similarity of n-gram graphs
-            GraphSimilarity nGramSimilarity = comparator.getSimilarityBetween(nGramGraph1, nGramGraph2);
+        // Compare with named entity graph (dummy method)
+        for (String dummyWord : dummyWords) {
+            String text1Dummy = text1.getEntityTextWithDummyWord(dummyWord);
+            DocumentWordGraph wordGraph1 = new DocumentWordGraph();
+            wordGraph1.setDataString(text1Dummy);
 
-            System.out.println("N-gram Graph similarity:\t\t" + nGramSimilarity.toString());
+            String text2Dummy = text2.getEntityTextWithDummyWord(dummyWord);
+            DocumentWordGraph wordGraph2 = new DocumentWordGraph();
+            wordGraph2.setDataString(text2Dummy);
+
+            GraphSimilarity entitySimilarity = comparator.getSimilarityBetween(wordGraph1, wordGraph2);
+
+            System.out.println("Dummy similarity (" + dummyWord + "):\t" + entitySimilarity.toString());
         }
     }
 }

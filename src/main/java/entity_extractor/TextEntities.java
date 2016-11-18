@@ -8,8 +8,6 @@ import java.util.StringTokenizer;
  */
 public class TextEntities {
     private final static String wordSeparator = " ";
-    private final static String dummyWord = ".";
-//    private final static String dummyWord = "NaE";
 
     private ArrayList<ExtractedEntity> entities;
     private String text;
@@ -45,9 +43,10 @@ public class TextEntities {
 
     /**
      * Return a string that is the original text, with every word that is not an entity replaced by a dummy word
-     * @return  Text with non-entity words replaced by a dummy word
+     * @param dummyWord Word to replace non-entity words with
+     * @return          Text with non-entity words replaced by the dummy word
      */
-    public String getEntityText() {
+    public String getEntityTextWithDummyWord(String dummyWord) {
         int wordsNum = this.getNumberOfWordsInText();
 
         // Create string that is the same number of words as original text but all words are the dummy word
