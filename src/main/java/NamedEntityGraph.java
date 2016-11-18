@@ -30,18 +30,21 @@ public class NamedEntityGraph {
         try {
             if (input.isDirectory()) {
                 System.out.println("working on all files in " + input.getAbsolutePath());
-                for (File file : input.listFiles()) {
-                    if (file.isFile()) {
-                        System.out.println("[main] Getting entities for " + file);
+                File[] files = input.listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        if (file.isFile()) {
+                            System.out.println("[main] Getting entities for " + file);
 
-                        TextEntities entities = entityExtractor.getEntities(file);
+                            TextEntities entities = entityExtractor.getEntities(file);
 //                        entities.printEntities();
 
-                        texts.add(entities);
+                            texts.add(entities);
 
-                        System.out.println("[main] Got " + entities.getEntities().size() + " extracted entities from " + file + "\n");
-                    } else {
-                        System.out.println("Skipping " + file.getAbsolutePath());
+                            System.out.println("[main] Got " + entities.getEntities().size() + " extracted entities from " + file + "\n");
+                        } else {
+                            System.out.println("Skipping " + file.getAbsolutePath());
+                        }
                     }
                 }
             }
