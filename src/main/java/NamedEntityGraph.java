@@ -52,6 +52,11 @@ public class NamedEntityGraph {
         compareTexts(texts.get(0), texts.get(1));
     }
 
+    /**
+     * Compare texts in various ways
+     * @param text1 Extracted data from 1st text
+     * @param text2 Extracted data from 2nd text
+     */
     private static void compareTexts(TextEntities text1, TextEntities text2) {
         // Create comparator object
         NGramCachedGraphComparator comparator = new NGramCachedGraphComparator();
@@ -70,16 +75,30 @@ public class NamedEntityGraph {
         // Compare with named entity graph (dummy method)
         for (String dummyWord : dummyWords) {
             String text1Dummy = text1.getEntityTextWithDummyWord(dummyWord);
-            DocumentWordGraph wordGraph1 = new DocumentWordGraph();
-            wordGraph1.setDataString(text1Dummy);
-
             String text2Dummy = text2.getEntityTextWithDummyWord(dummyWord);
-            DocumentWordGraph wordGraph2 = new DocumentWordGraph();
-            wordGraph2.setDataString(text2Dummy);
 
-            GraphSimilarity entitySimilarity = comparator.getSimilarityBetween(wordGraph1, wordGraph2);
+            GraphSimilarity entitySimilarity = getWordGraphSimilarity(comparator, text1Dummy, text2Dummy);
 
             System.out.println("Dummy similarity (" + dummyWord + "):\t" + entitySimilarity.toString());
         }
+    }
+
+    /**
+     * Create document word graphs for each text and return their graph similarity using the comparator
+     * @param comparator    Comparator to use
+     * @param text1         First text
+     * @param text2         Second text
+     * @return              Graph similarity object
+     */
+    private static GraphSimilarity getWordGraphSimilarity(NGramCachedGraphComparator comparator, String text1, String text2) {
+        // Create graph for text 1
+        DocumentWordGraph wordGraph1 = new DocumentWordGraph();
+        wordGraph1.setDataString(text1);
+
+        // Create graph for text 2
+        DocumentWordGraph wordGraph2 = new DocumentWordGraph();
+        wordGraph2.setDataString(text2);
+
+        return comparator.getSimilarityBetween(wordGraph1, wordGraph2);
     }
 }
