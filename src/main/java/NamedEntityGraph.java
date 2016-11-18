@@ -66,8 +66,7 @@ public class NamedEntityGraph {
             // Get similarity of graphs
             GraphSimilarity entitySimilarity = comparator.getSimilarityBetween(entityGraph1, entityGraph2);
 
-            double entitySimVal = entitySimilarity.getOverallSimilarity();
-            System.out.println("Named Entity Graph similarity:\t" + entitySimVal);
+            System.out.println("Named Entity Graph similarity:\t" + entitySimilarity.toString());
         }
 
         // Compare 2 first n-gram graphs
@@ -78,8 +77,7 @@ public class NamedEntityGraph {
             // Get similarity of n-gram graphs
             GraphSimilarity nGramSimilarity = comparator.getSimilarityBetween(nGramGraph1, nGramGraph2);
 
-            double nGramSimVal = nGramSimilarity.getOverallSimilarity();
-            System.out.println("N-gram Graph similarity:\t\t" + nGramSimVal);
+            System.out.println("N-gram Graph similarity:\t\t" + nGramSimilarity.toString());
         }
     }
 }
