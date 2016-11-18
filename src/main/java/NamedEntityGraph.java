@@ -21,6 +21,7 @@ public class NamedEntityGraph {
 
                         TextEntities entities = entityExtractor.getEntities(file);
                         entities.printEntities();
+                        System.out.println(entities.getEntityText());
 
                         System.out.println("[main] Got " + entities.getEntities().size() + " extracted entities from " + file);
                     } else {

@@ -8,6 +8,9 @@ import java.util.StringTokenizer;
  */
 public class TextEntities {
     private final static String wordSeparator = " ";
+    private final static String dummyWord = ".";
+//    private final static String dummyWord = "NaE";
+
     private ArrayList<ExtractedEntity> entities;
     private String text;
 
@@ -38,6 +41,39 @@ public class TextEntities {
         }
 
         System.out.println("Number of words in text: " + getNumberOfWordsInText());
+    }
+
+    /**
+     * Return a string that is the original text, with every word that is not an enttiy replaced by a dummy word
+     * @return  Text with non-entity words replaced by a dummy word
+     */
+    public String getEntityText() {
+        int wordsNum = this.getNumberOfWordsInText();
+
+        // Create string that is the same number of words as original text but all words are the dummy word
+        ArrayList<String> entityTextWords = new ArrayList<>(wordsNum);
+
+
+        for (int i = 0; i < wordsNum; i++) {
+            entityTextWords.add(i, dummyWord);
+        }
+
+        // Replace words that should be entities with their entity names
+        for (ExtractedEntity e : entities) {
+            int index = getEntityIndex(e.getOffset());
+            String entityText = e.getName();
+
+            entityTextWords.set(index, entityText);
+        }
+
+        // Create string from the array list
+        StringBuilder sb = new StringBuilder();
+        for (String word : entityTextWords) {
+            sb.append(word);
+            sb.append(wordSeparator);
+        }
+
+        return sb.toString();
     }
 
     private int getNumberOfWordsInText() {
