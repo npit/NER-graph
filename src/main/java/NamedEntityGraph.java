@@ -4,6 +4,7 @@ import entity_extractor.open_calais_extractor.OpenCalaisExtractor;
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentWordGraph;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class NamedEntityGraph {
     public static void main(String[] args) {
@@ -12,6 +13,7 @@ public class NamedEntityGraph {
 
         File input = new File(inputFolder);
         EntityExtractor entityExtractor = new OpenCalaisExtractor();
+        ArrayList<DocumentWordGraph> graphs = new ArrayList<>();
 
         try {
             if (input.isDirectory()) {
@@ -21,7 +23,7 @@ public class NamedEntityGraph {
                         System.out.println("[main] Getting entities for " + file);
 
                         TextEntities entities = entityExtractor.getEntities(file);
-                        entities.printEntities();
+//                        entities.printEntities();
 
                         String entityText = entities.getEntityText();
                         System.out.println(entityText);
@@ -30,7 +32,9 @@ public class NamedEntityGraph {
                         DocumentWordGraph wordGraph = new DocumentWordGraph();
                         wordGraph.setDataString(entityText);
 
-                        System.out.println("[main] Got " + entities.getEntities().size() + " extracted entities from " + file);
+                        graphs.add(wordGraph);
+
+                        System.out.println("[main] Got " + entities.getEntities().size() + " extracted entities from " + file + "\n");
                     } else {
                         System.out.println("Skipping " + file.getAbsolutePath());
                     }
