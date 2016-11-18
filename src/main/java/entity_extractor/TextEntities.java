@@ -41,6 +41,16 @@ public class TextEntities {
         System.out.println("Number of words in text: " + getNumberOfWordsInText());
     }
 
+    private String getStringFromArrayList(ArrayList<String> stringList) {
+        StringBuilder sb = new StringBuilder();
+        for (String word : stringList) {
+            sb.append(word);
+            sb.append(wordSeparator);
+        }
+
+        return sb.toString();
+    }
+
     /**
      * Return a string that is the original text, with every word that is not an entity replaced by a dummy word
      * @param dummyWord Word to replace non-entity words with
@@ -66,21 +76,15 @@ public class TextEntities {
         }
 
         // Create string from the array list
-        StringBuilder sb = new StringBuilder();
-        for (String word : entityTextWords) {
-            sb.append(word);
-            sb.append(wordSeparator);
-        }
-
-        return sb.toString();
+        return getStringFromArrayList(entityTextWords);
     }
 
     /**
      * Return a string that is the original text, with every non-entity word replaced by a dummy word of the same size.
      * The dummy word is repeated multiple times until its length exceeds that of the original word and is then trimmed
      * to be the exact size of the original word.
-     * @param dummyWord
-     * @return
+     * @param dummyWord Word to replace non-entity words with
+     * @return          The text in the described form
      */
     public String getEntityTextWithDummyWordSameSize(String dummyWord) {
         //todo
@@ -89,7 +93,7 @@ public class TextEntities {
 
     /**
      * Return a string that is the original text with every non-entity word replaced by a random word of the same size
-     * @return
+     * @return  The text in the described form
      */
     public String getEntityTextWithRandomWord() {
         //todo
