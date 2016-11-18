@@ -33,8 +33,8 @@ public class TextEntities {
 
     public void printEntities() {
         for (ExtractedEntity e : entities) {
-            System.out.println(e);
-            System.out.println("| index: " + getEntityIndex(e.getOffset()));
+            System.out.print(e);
+            System.out.println(" | index: " + getEntityIndex(e.getOffset()));
         }
 
         System.out.println("Number of words in text: " + getNumberOfWordsInText());
