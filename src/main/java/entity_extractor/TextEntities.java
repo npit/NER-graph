@@ -62,7 +62,6 @@ public class TextEntities {
         // Create string that is the same number of words as original text but all words are the dummy word
         ArrayList<String> entityTextWords = new ArrayList<>(wordsNum);
 
-
         for (int i = 0; i < wordsNum; i++) {
             entityTextWords.add(i, dummyWord);
         }
@@ -87,8 +86,36 @@ public class TextEntities {
      * @return          The text in the described form
      */
     public String getEntityTextWithDummyWordSameSize(String dummyWord) {
-        //todo
-        return "";
+        int numOfWords = this.getNumberOfWordsInText();
+
+        // Create array with the original text's words
+        StringTokenizer st = new StringTokenizer(this.text, wordSeparator);
+        ArrayList<String> words = new ArrayList<>(numOfWords);
+
+
+        int tokenIndex = 0;
+        while(st.hasMoreTokens()) {
+            words.add(tokenIndex++, st.nextToken());
+        }
+
+        for (int i = 0; i < numOfWords; i++) {
+            // Get the word to replace and its length
+            String word = words.get(i);
+            int wordLen = word.length();
+
+            // Create word to replace it
+            String newWord = "";
+
+            do {
+                newWord += dummyWord;
+            } while (newWord.length() <= wordLen);
+
+            newWord = newWord.substring(0, wordLen);
+
+            words.set(i, newWord);
+        }
+
+        return getStringFromArrayList(words);
     }
 
     /**

@@ -75,7 +75,7 @@ public class NamedEntityGraph {
 
         System.out.println("N-gram similarity:\t\t" + nGramSimilarity.toString());
 
-        // Compare with named entity graph (dummy method)
+        // Compare with named entity graph dummy method
         for (String dummyWord : dummyWords) {
             String text1Dummy = text1.getEntityTextWithDummyWord(dummyWord);
             String text2Dummy = text2.getEntityTextWithDummyWord(dummyWord);
@@ -83,6 +83,18 @@ public class NamedEntityGraph {
             GraphSimilarity entitySimilarity = getWordGraphSimilarity(comparator, text1Dummy, text2Dummy);
 
             System.out.println("Dummy similarity (" + dummyWord + "):\t" + entitySimilarity.toString());
+        }
+
+        // Compare with named entity graph dummy same size method
+        for (String dummyWord : dummyWords) {
+            String text1Dummy = text1.getEntityTextWithDummyWordSameSize(dummyWord);
+            String text2Dummy = text2.getEntityTextWithDummyWordSameSize(dummyWord);
+
+            // Code that gives stack overflow exception:
+//            GraphSimilarity entitySimilarity = getWordGraphSimilarity(comparator, text1Dummy, text2Dummy);
+//
+//            System.out.println("Dummy SS similarity (" + dummyWord + "):\t" + entitySimilarity.toString());
+
         }
     }
 
