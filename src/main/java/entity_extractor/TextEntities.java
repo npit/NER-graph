@@ -75,6 +75,27 @@ public class TextEntities {
         return sb.toString();
     }
 
+    /**
+     * Return a string that is the original text, with every non-entity word replaced by a dummy word of the same size.
+     * The dummy word is repeated multiple times until its length exceeds that of the original word and is then trimmed
+     * to be the exact size of the original word.
+     * @param dummyWord
+     * @return
+     */
+    public String getEntityTextWithDummyWordSameSize(String dummyWord) {
+        //todo
+        return "";
+    }
+
+    /**
+     * Return a string that is the original text with every non-entity word replaced by a random word of the same size
+     * @return
+     */
+    public String getEntityTextWithRandomWord() {
+        //todo
+        return "";
+    }
+
     private int getNumberOfWordsInText() {
         StringTokenizer st = new StringTokenizer(text, wordSeparator);
 
