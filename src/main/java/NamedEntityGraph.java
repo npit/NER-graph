@@ -1,6 +1,7 @@
 import entity_extractor.EntityExtractor;
-import entity_extractor.open_calais_extractor.OpenCalaisExtractor;
 import entity_extractor.TextEntities;
+import entity_extractor.open_calais_extractor.OpenCalaisExtractor;
+import gr.demokritos.iit.jinsect.documentModel.representations.DocumentWordGraph;
 
 import java.io.File;
 
@@ -21,11 +22,17 @@ public class NamedEntityGraph {
 
                         TextEntities entities = entityExtractor.getEntities(file);
                         entities.printEntities();
-                        System.out.println(entities.getEntityText());
+
+                        String entityText = entities.getEntityText();
+                        System.out.println(entityText);
+
+                        // Create a word graph
+                        DocumentWordGraph wordGraph = new DocumentWordGraph();
+                        wordGraph.setDataString(entityText);
 
                         System.out.println("[main] Got " + entities.getEntities().size() + " extracted entities from " + file);
                     } else {
-                        System.out.println("skipping "+file.getAbsolutePath());
+                        System.out.println("Skipping " + file.getAbsolutePath());
                     }
                 }
             }

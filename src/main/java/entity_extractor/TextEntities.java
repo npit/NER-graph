@@ -44,7 +44,7 @@ public class TextEntities {
     }
 
     /**
-     * Return a string that is the original text, with every word that is not an enttiy replaced by a dummy word
+     * Return a string that is the original text, with every word that is not an entity replaced by a dummy word
      * @return  Text with non-entity words replaced by a dummy word
      */
     public String getEntityText() {
