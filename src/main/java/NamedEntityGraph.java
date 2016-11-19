@@ -68,8 +68,13 @@ public class NamedEntityGraph {
                 TextEntities text1 = texts.get(i);
                 TextEntities text2 = texts.get(j);
 
-                System.out.println("Comparing " + text1.getTitle() + " with " + text2.getTitle());
-                compareTexts(text1, text2);
+                System.out.println("Comparing " + text1.getTitle() + " (" + text1.getEntities().size() + " entities) with " + text2.getTitle() + "(" + text2.getEntities().size() + " entities)");
+
+                try {
+                    compareTexts(text1, text2);
+                } catch (StackOverflowError e) {
+                    System.err.println("StackOverflow error!");
+                }
                 System.out.println();
             }
         }
