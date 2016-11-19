@@ -61,7 +61,7 @@ public class TextEntities {
     public String getEntityTextWithPlaceholders(String placeholder) {
         int wordsNum = this.getNumberOfWordsInText();
 
-        // Create string that is the same number of words as original text but all words are the dummy word
+        // Create string that is the same number of words as original text but all words are the placeholder word
         ArrayList<String> entityTextWords = new ArrayList<>(wordsNum);
 
         for (int i = 0; i < wordsNum; i++) {
