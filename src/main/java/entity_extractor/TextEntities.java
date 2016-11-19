@@ -1,6 +1,7 @@
 package entity_extractor;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.StringTokenizer;
 
 /**
@@ -8,6 +9,7 @@ import java.util.StringTokenizer;
  */
 public class TextEntities {
     private final static String wordSeparator = " ";
+    private final static String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     private ArrayList<ExtractedEntity> entities;
     private String text;
@@ -115,7 +117,7 @@ public class TextEntities {
 
             words.set(i, newWord);
         }
-        
+
         // Add entity names back to the text
         for (ExtractedEntity e : this.entities) {
             int entityIndex = this.getEntityIndex(e.getOffset());
@@ -131,8 +133,47 @@ public class TextEntities {
      * @return  The text in the described form
      */
     public String getEntityTextWithRandomWord() {
-        //todo
-        return "";
+        Random r = new Random();
+        int alphabetLength = alphabet.length();
+        int numOfWords = this.getNumberOfWordsInText();
+
+        // Create array with the original text's words
+        StringTokenizer st = new StringTokenizer(this.text, wordSeparator);
+        ArrayList<String> words = new ArrayList<>(numOfWords);
+
+
+        int tokenIndex = 0;
+        while(st.hasMoreTokens()) {
+            words.add(tokenIndex++, st.nextToken());
+        }
+
+        // Turn all words into words with random letters
+        for (int i = 0; i < numOfWords; i++) {
+            // Get the word to replace and its length
+            String word = words.get(i);
+            int wordLen = word.length();
+
+            // Create word to replace it
+            String newWord = "";
+
+            do {
+                // Add a random character from the alphabet to the word
+                newWord += alphabet.charAt(r.nextInt(alphabetLength));
+            } while (newWord.length() <= wordLen);
+
+            newWord = newWord.substring(0, wordLen);
+
+            words.set(i, newWord);
+        }
+
+        // Add entity names back to the text
+        for (ExtractedEntity e : this.entities) {
+            int entityIndex = this.getEntityIndex(e.getOffset());
+
+            words.set(entityIndex, e.getName());
+        }
+
+        return getStringFromArrayList(words);
     }
 
     private int getNumberOfWordsInText() {
