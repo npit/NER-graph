@@ -18,6 +18,7 @@ public class OpenCalaisExtractor implements EntityExtractor {
 
     private static final String outputFolder = "texts/output";
     private static final boolean enableCache = true;
+    private static final int sleepTime = 500;
 
     private final ArrayList<String> apiKeys;
     private File output;
@@ -207,6 +208,13 @@ public class OpenCalaisExtractor implements EntityExtractor {
         } else {
             System.out.println("no");
             response = postFile(input, createPostMethod());
+
+            // Sleep for a while in order to prevent OpenCalais error 429 (too many concurrent requests)
+            try {
+                Thread.sleep(sleepTime);
+            } catch(InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         // Get entities from response and add filename as title
