@@ -209,6 +209,10 @@ public class OpenCalaisExtractor implements EntityExtractor {
             response = postFile(input, createPostMethod());
         }
 
-        return getEntitiesFromOpenCalaisResponse(response);
+        // Get entities from response and add filename as title
+        TextEntities entities = getEntitiesFromOpenCalaisResponse(response);
+        entities.setTitle(input.getName());
+
+        return entities;
     }
 }

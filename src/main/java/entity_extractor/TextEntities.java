@@ -7,6 +7,7 @@ import java.util.StringTokenizer;
 /**
  * Entities extracted from a text
  */
+@SuppressWarnings("WeakerAccess")
 public class TextEntities {
     private final static String wordSeparator = " ";
     private final static String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
