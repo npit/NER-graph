@@ -1,8 +1,5 @@
-package entity_extractor.open_calais_extractor;
+package entity_extractor;
 
-import entity_extractor.EntityExtractor;
-import entity_extractor.ExtractedEntity;
-import entity_extractor.TextEntities;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
