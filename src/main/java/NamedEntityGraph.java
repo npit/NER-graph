@@ -37,7 +37,7 @@ public class NamedEntityGraph {
                             System.out.println("[main] Getting entities for " + file);
 
                             TextEntities entities = entityExtractor.getEntities(file);
-//                        entities.printEntities();
+//                            entities.printEntities();
 
                             texts.add(entities);
 
@@ -73,7 +73,7 @@ public class NamedEntityGraph {
 
         GraphSimilarity nGramSimilarity = comparator.getSimilarityBetween(nGramGraph1, nGramGraph2);
 
-        System.out.println("N-gram similarity:\t\t" + nGramSimilarity.toString());
+        System.out.println("N-gram similarity:\t" + nGramSimilarity.toString());
 
         // Compare with named entity graph dummy method
         for (String dummyWord : dummyWords) {
@@ -82,7 +82,7 @@ public class NamedEntityGraph {
 
             GraphSimilarity entitySimilarity = getWordGraphSimilarity(comparator, text1Dummy, text2Dummy);
 
-            System.out.println("Dummy similarity (" + dummyWord + "):\t" + entitySimilarity.toString());
+            System.out.println("Dummy (" + dummyWord + "):\t\t\t" + entitySimilarity.toString());
         }
 
         // Compare with named entity graph dummy same size method
@@ -91,9 +91,9 @@ public class NamedEntityGraph {
             String text2Dummy = text2.getEntityTextWithDummyWordSameSize(dummyWord);
 
             // Code that gives stack overflow exception:
-//            GraphSimilarity entitySimilarity = getWordGraphSimilarity(comparator, text1Dummy, text2Dummy);
-//
-//            System.out.println("Dummy SS similarity (" + dummyWord + "):\t" + entitySimilarity.toString());
+            GraphSimilarity entitySimilarity = getWordGraphSimilarity(comparator, text1Dummy, text2Dummy);
+
+            System.out.println("DummySameSize (" + dummyWord + "):\t" + entitySimilarity.toString());
 
         }
     }
