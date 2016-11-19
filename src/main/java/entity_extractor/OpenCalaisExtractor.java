@@ -12,6 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class OpenCalaisExtractor implements EntityExtractor {
     private static final String CALAIS_URL = "https://api.thomsonreuters.com/permid/calais";
@@ -20,6 +22,7 @@ public class OpenCalaisExtractor implements EntityExtractor {
     private static final boolean enableCache = true;
     private static final int sleepTime = 500;
 
+    private final Logger LOGGER = Logger.getLogger("NamedEntityGraph");
     private final ArrayList<String> apiKeys;
     private File output;
     private HttpClient client;
@@ -51,17 +54,17 @@ public class OpenCalaisExtractor implements EntityExtractor {
         try {
             int returnCode = client.executeMethod(method);
             if (returnCode == HttpStatus.SC_NOT_IMPLEMENTED) {
-                System.err.println("The Post method is not implemented by this URI");
+                LOGGER.log(Level.SEVERE, "The Post method is not implemented by this URI");
                 // still consume the response body
                 method.getResponseBodyAsString();
             } else if (returnCode == HttpStatus.SC_OK) {
-                System.out.println("File post succeeded: " + file);
+                LOGGER.log(Level.FINE, "File post succeeded: " + file);
 
                 return saveResponse(file, method);
             } else {
-                System.err.println("File post failed: " + file);
-                System.err.println("Got code: " + returnCode);
-                System.err.println("response: "+method.getResponseBodyAsString());
+                LOGGER.log(Level.SEVERE, "File post failed: " + file);
+                LOGGER.log(Level.SEVERE, "Got code: " + returnCode);
+                LOGGER.log(Level.SEVERE, "response: "+method.getResponseBodyAsString());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,7 +121,7 @@ public class OpenCalaisExtractor implements EntityExtractor {
             // Credit: http://stackoverflow.com/a/40299794
             response = new String(Files.readAllBytes(Paths.get(file.toString())));
         } catch (IOException e) {
-            System.err.println("Error while reading cached file: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error while reading cached file: " + e.getMessage());
         }
         return response;
     }
@@ -167,7 +170,7 @@ public class OpenCalaisExtractor implements EntityExtractor {
             for (Object instance : instances) {
                 // Check that the object is indeed a JSONObject before casting it
                 if (!(instance instanceof JSONObject)) {
-                    System.err.println("Instance is not a JSONObject! Skipping it...");
+                    LOGGER.log(Level.SEVERE, "Instance is not a JSONObject! Skipping it...");
                     continue;
                 }
 
@@ -175,7 +178,7 @@ public class OpenCalaisExtractor implements EntityExtractor {
                 JSONObject i = (JSONObject)instance;
 
                 if (!i.has("offset") || !i.has("length")) {
-                    System.err.println("Instance does not have offset or length! Skipping it...");
+                    LOGGER.log(Level.SEVERE, "Instance does not have offset or length! Skipping it...");
                     continue;
                 }
 
@@ -195,18 +198,18 @@ public class OpenCalaisExtractor implements EntityExtractor {
         return entities;
     }
 
+    @Override
     public TextEntities getEntities(File input) {
         // Before making request to OpenCalais, check that the file does not already exist
         String outputFilename = output.toString() + "/" + input.getName() + ".json";
         File outfile = new File(outputFilename);
 
-        System.out.print("[OpenCalaisExtractor] Checking if OpenCalais response is cached... ");
         String response = null;
         if (outfile.isFile() && enableCache) {
-            System.out.println("yes");
+            LOGGER.log(Level.FINE, "[OpenCalaisExtractor] OpenCalais response is cached, using saved response...");
             response = getCachedResponse(outfile);
         } else {
-            System.out.println("no");
+            LOGGER.log(Level.FINE, "[OpenCalaisExtractor] Requesting entities from OpenCalais...");
 
             boolean responseOk = false;
             while(!responseOk) {

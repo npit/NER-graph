@@ -5,14 +5,46 @@ import gr.demokritos.iit.jinsect.documentModel.comparators.NGramCachedGraphCompa
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentWordGraph;
 import gr.demokritos.iit.jinsect.structs.GraphSimilarity;
+import utils.Percentage;
+import utils.VerySimpleFormatter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.*;
 
 public class NamedEntityGraph {
-    private static ArrayList<String> placeholders;
+    private final Logger LOGGER = Logger.getLogger("NamedEntityGraph");
+    private ArrayList<String> placeholders;
+    private Handler consoleHandler = null;
+    private Handler fileHandler = null;
 
     public static void main(String[] args) {
+        NamedEntityGraph neg = new NamedEntityGraph();
+
+        try {
+            neg.start();
+        } catch(IOException e) {
+            System.err.println("Problem writing log file");
+        }
+    }
+
+    public void start() throws IOException {
+        // Setup logger
+        LOGGER.setLevel(Level.FINEST);
+        LOGGER.setUseParentHandlers(false);
+
+        // Add handlers to the logger
+        consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(Level.INFO);
+        consoleHandler.setFormatter(new VerySimpleFormatter());
+        LOGGER.addHandler(consoleHandler);
+
+        fileHandler = new FileHandler("./neg.log");
+        fileHandler.setLevel(Level.FINEST);
+        fileHandler.setFormatter(new VerySimpleFormatter());
+        LOGGER.addHandler(fileHandler);
+
         // Main variables
         String inputFolder = "texts/input";
 
@@ -30,26 +62,33 @@ public class NamedEntityGraph {
 
         try {
             if (input.isDirectory()) {
-                System.out.println("working on all files in " + input.getAbsolutePath());
+                LOGGER.log(Level.INFO, "working on all files in " + input.getAbsolutePath());
                 File[] files = input.listFiles();
                 if (files != null) {
                     int i = 1;
                     int totalFiles = files.length;
-                    double percentage;
+                    double percentage = 0;
+                    double currPercent;
 
                     for (File file : files) {
                         if (file.isFile()) {
-                            percentage = (i * 100.0)/totalFiles;
-                            System.out.format("[main] (" + i + "/" + files.length + " - %.2f%%) Getting entities for " + file + "\n", percentage);
+                            currPercent = Percentage.percent(i, totalFiles);
+                            Level lvl = Level.FINE;
+                            if (currPercent - percentage > 1) {
+                                lvl = Level.INFO;
+                                percentage = currPercent;
+                            }
+
+                            LOGGER.log(lvl, String.format("[main] (" + i + "/" + files.length + " - %.2f%%) Getting entities for " + file + "", currPercent));
 
                             TextEntities entities = entityExtractor.getEntities(file);
 //                            entities.printEntities();
 
                             texts.add(entities);
 
-                            System.out.println("[main] Got " + entities.getEntities().size() + " extracted entities from " + file + "\n");
+                            LOGGER.log(Level.FINE, "[main] Got " + entities.getEntities().size() + " extracted entities from " + file + "\n");
                         } else {
-                            System.out.println("Skipping " + file.getAbsolutePath());
+                            LOGGER.log(Level.FINE, "Skipping " + file.getAbsolutePath());
                         }
 
                         i++;
@@ -57,35 +96,49 @@ public class NamedEntityGraph {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Not comparing anything, there was an error");
+            LOGGER.log(Level.SEVERE, e.getStackTrace().toString());
+            LOGGER.log(Level.SEVERE, "Not comparing anything, there was an error");
             return;
         }
 
         // Compare every text with every other text
+        LOGGER.log(Level.INFO, "Starting text comparisons...");
+
         int textsLen = texts.size();
+        int totalComparisons = textsLen * (textsLen - 1) / 2;
+        int comparisonsDone = 0;
+        double percentage = 0;
+        double currPercent;
         for (int i = 0; i < textsLen - 1; i++) {
             for (int j = i + 1; j < textsLen; j++) {
+                currPercent = Percentage.percent(comparisonsDone, totalComparisons);
+                Level lvl = Level.FINE;
+                if (currPercent - percentage > 0.1) {
+                    lvl = Level.INFO;
+                    percentage = currPercent;
+                }
+
                 TextEntities text1 = texts.get(i);
                 TextEntities text2 = texts.get(j);
 
-                System.out.println("Comparing " + text1.getTitle() + " (" + text1.getEntities().size() + " entities) with " + text2.getTitle() + "(" + text2.getEntities().size() + " entities)");
+                LOGGER.log(lvl, String.format("[%.2f%% - " + comparisonsDone + "/" + totalComparisons + "] Comparing " + text1.getTitle() + " with " + text2.getTitle(), percentage));
 
                 try {
                     compareTexts(text1, text2);
                 } catch (StackOverflowError e) {
-                    errors.add(text1.getTitle() + " (" + text1.getEntities().size() + " entities) & " + text2.getTitle() + "(" + text2.getEntities().size() + " entities)");
+                    errors.add(text1.getTitle() + " & " + text2.getTitle());
                 }
-                System.out.println();
+                LOGGER.log(Level.FINE, "");
+                comparisonsDone++;
             }
         }
 
         // Print any errors that occurred
         if (errors.size() > 0) {
-            System.err.println("Errors:");
+            LOGGER.log(Level.SEVERE, "Errors:");
 
             for (String error : errors) {
-                System.err.println(error);
+                LOGGER.log(Level.SEVERE, error);
             }
         }
     }
@@ -95,7 +148,7 @@ public class NamedEntityGraph {
      * @param text1 Extracted data from 1st text
      * @param text2 Extracted data from 2nd text
      */
-    private static void compareTexts(TextEntities text1, TextEntities text2) {
+    private void compareTexts(TextEntities text1, TextEntities text2) {
         // Create comparator object
         NGramCachedGraphComparator comparator = new NGramCachedGraphComparator();
 
@@ -111,7 +164,7 @@ public class NamedEntityGraph {
 
         sim = comparator.getSimilarityBetween(nGramGraph1, nGramGraph2);
 
-        System.out.println("N-gram similarity:\t" + sim.toString());
+        LOGGER.log(Level.FINE, "N-gram similarity:\t" + sim.toString());
 
         // Compare with named entity graph placeholder method
         for (String placeholder : placeholders) {
@@ -120,7 +173,7 @@ public class NamedEntityGraph {
 
             sim = getWordGraphSimilarity(comparator, text1data, text2data);
 
-            System.out.println("Placeholder (" + placeholder + "):\t" + sim.toString());
+            LOGGER.log(Level.FINE, "Placeholder (" + placeholder + "):\t\t" + sim.toString());
         }
 
         // Compare with named entity graph placeholder same size method
@@ -131,7 +184,7 @@ public class NamedEntityGraph {
             // Code that gives stack overflow exception:
             sim = getWordGraphSimilarity(comparator, text1data, text2data);
 
-            System.out.println("PHSameSize (" + placeholder + "):\t\t" + sim.toString());
+            LOGGER.log(Level.FINE, "PHSameSize (" + placeholder + "):\t\t" + sim.toString());
         }
 
         // Compare with named entity graph random word method
@@ -140,8 +193,7 @@ public class NamedEntityGraph {
 
         sim = getWordGraphSimilarity(comparator, text1data, text2data);
 
-        System.out.println("Random words:\t\t" + sim.toString());
-
+        LOGGER.log(Level.FINE, "Random words:\t\t\t" + sim.toString());
     }
 
     /**
@@ -151,7 +203,7 @@ public class NamedEntityGraph {
      * @param text2         Second text
      * @return              Graph similarity object
      */
-    private static GraphSimilarity getWordGraphSimilarity(NGramCachedGraphComparator comparator, String text1, String text2) {
+    private GraphSimilarity getWordGraphSimilarity(NGramCachedGraphComparator comparator, String text1, String text2) {
         // Create graph for text 1
         DocumentWordGraph wordGraph1 = new DocumentWordGraph();
         wordGraph1.setDataString(text1);
