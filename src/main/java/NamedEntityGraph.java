@@ -1,10 +1,7 @@
 import entity_extractor.EntityExtractor;
+import entity_extractor.MyRunnable;
 import entity_extractor.OpenCalaisExtractor;
 import entity_extractor.TextEntities;
-import gr.demokritos.iit.jinsect.documentModel.comparators.NGramCachedGraphComparator;
-import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
-import gr.demokritos.iit.jinsect.documentModel.representations.DocumentWordGraph;
-import gr.demokritos.iit.jinsect.structs.GraphSimilarity;
 import utils.Percentage;
 import utils.VerySimpleFormatter;
 
@@ -106,30 +103,35 @@ public class NamedEntityGraph {
         int textsLen = texts.size();
         int totalComparisons = textsLen * (textsLen - 1) / 2;
         int comparisonsDone = 0;
-        double percentage = 0;
-        double currPercent;
-        for (int i = 0; i < textsLen - 1; i++) {
-            for (int j = i + 1; j < textsLen; j++) {
-                currPercent = Percentage.percent(comparisonsDone, totalComparisons);
-                Level lvl = Level.FINE;
-                if (currPercent - percentage > 0.1) {
-                    lvl = Level.INFO;
-                    percentage = currPercent;
+        ArrayList<Thread> myThreads = new ArrayList<>();
+
+        int cores = Runtime.getRuntime().availableProcessors();
+        LOGGER.log(Level.INFO, "Using " + cores + " cores...");
+
+        for (int i = 0; i < textsLen - 1; i += cores) {
+            int comparisonsForTheseThreads = 0;
+            for (int h = 0; h < cores; h++) {
+                if (i + h < textsLen) {
+                    comparisonsForTheseThreads += textsLen - (i + 1);
+                    MyRunnable r = new MyRunnable(i + h, textsLen, placeholders, errors, texts);
+                    Thread t = new Thread(r);
+                    myThreads.add(t);
+
+                    t.start();
                 }
-
-                TextEntities text1 = texts.get(i);
-                TextEntities text2 = texts.get(j);
-
-                LOGGER.log(lvl, String.format("[%.2f%% - " + comparisonsDone + "/" + totalComparisons + "] Comparing " + text1.getTitle() + " with " + text2.getTitle(), percentage));
-
-                try {
-                    compareTexts(text1, text2);
-                } catch (StackOverflowError e) {
-                    errors.add(text1.getTitle() + " & " + text2.getTitle());
-                }
-                LOGGER.log(Level.FINE, "");
-                comparisonsDone++;
             }
+
+            // wait all threads to finish
+            for (Thread t : myThreads) {
+                try {
+                    t.join();
+                } catch(InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            comparisonsDone += comparisonsForTheseThreads;
+            LOGGER.log(Level.INFO, String.format("Progress: %.2f%% - " + comparisonsDone + "/" + totalComparisons + " comparisons", Percentage.percent(comparisonsDone, totalComparisons)));
         }
 
         // Print any errors that occurred
@@ -140,77 +142,5 @@ public class NamedEntityGraph {
                 LOGGER.log(Level.SEVERE, error);
             }
         }
-    }
-
-    /**
-     * Compare texts in various ways
-     * @param text1 Extracted data from 1st text
-     * @param text2 Extracted data from 2nd text
-     */
-    private void compareTexts(TextEntities text1, TextEntities text2) {
-        // Create comparator object
-        NGramCachedGraphComparator comparator = new NGramCachedGraphComparator();
-
-        // Declare graph similarity and string objects
-        GraphSimilarity sim;
-        String text1data, text2data;
-
-        // Compare with n-gram graphs
-        DocumentNGramGraph nGramGraph1 = new DocumentWordGraph();
-        DocumentNGramGraph nGramGraph2 = new DocumentWordGraph();
-        nGramGraph1.setDataString(text1.getText());
-        nGramGraph2.setDataString(text2.getText());
-
-        sim = comparator.getSimilarityBetween(nGramGraph1, nGramGraph2);
-
-        LOGGER.log(Level.FINE, "N-gram similarity:\t" + sim.toString());
-
-        // Compare with named entity graph placeholder method
-        for (String placeholder : placeholders) {
-            text1data = text1.getEntityTextWithPlaceholders(placeholder);
-            text2data = text2.getEntityTextWithPlaceholders(placeholder);
-
-            sim = getWordGraphSimilarity(comparator, text1data, text2data);
-
-            LOGGER.log(Level.FINE, "Placeholder (" + placeholder + "):\t\t" + sim.toString());
-        }
-
-        // Compare with named entity graph placeholder same size method
-        for (String placeholder : placeholders) {
-            text1data = text1.getEntityTextWithPlaceholderSameSize(placeholder);
-            text2data = text2.getEntityTextWithPlaceholderSameSize(placeholder);
-
-            // Code that gives stack overflow exception:
-            sim = getWordGraphSimilarity(comparator, text1data, text2data);
-
-            LOGGER.log(Level.FINE, "PHSameSize (" + placeholder + "):\t\t" + sim.toString());
-        }
-
-        // Compare with named entity graph random word method
-//        text1data = text1.getEntityTextWithRandomWord();
-//        text2data = text2.getEntityTextWithRandomWord();
-//
-//        sim = getWordGraphSimilarity(comparator, text1data, text2data);
-//
-//        LOGGER.log(Level.FINE, "Random words:\t\t\t" + sim.toString());
-    }
-
-    /**
-     * Create document word graphs for each text and return their graph similarity using the comparator
-     * @param comparator    Comparator to use
-     * @param text1         First text
-     * @param text2         Second text
-     * @return              Graph similarity object
-     */
-    private GraphSimilarity getWordGraphSimilarity(NGramCachedGraphComparator comparator, String text1, String text2) {
-        // Create graph for text 1
-        DocumentWordGraph wordGraph1 = new DocumentWordGraph();
-        wordGraph1.setDataString(text1);
-
-        // Create graph for text 2
-        DocumentWordGraph wordGraph2 = new DocumentWordGraph();
-        wordGraph2.setDataString(text2);
-
-        return comparator.getSimilarityBetween(wordGraph1, wordGraph2);
     }
 }
