@@ -32,9 +32,14 @@ public class NamedEntityGraph {
                 System.out.println("working on all files in " + input.getAbsolutePath());
                 File[] files = input.listFiles();
                 if (files != null) {
+                    int i = 1;
+                    int totalFiles = files.length;
+                    double percentage;
+
                     for (File file : files) {
                         if (file.isFile()) {
-                            System.out.println("[main] Getting entities for " + file);
+                            percentage = (i * 100.0)/totalFiles;
+                            System.out.format("[main] (" + i + "/" + files.length + " - %.2f%%) Getting entities for " + file + "\n", percentage);
 
                             TextEntities entities = entityExtractor.getEntities(file);
 //                            entities.printEntities();
@@ -45,6 +50,8 @@ public class NamedEntityGraph {
                         } else {
                             System.out.println("Skipping " + file.getAbsolutePath());
                         }
+
+                        i++;
                     }
                 }
             }
