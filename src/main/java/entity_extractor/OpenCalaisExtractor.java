@@ -201,19 +201,28 @@ public class OpenCalaisExtractor implements EntityExtractor {
         File outfile = new File(outputFilename);
 
         System.out.print("[OpenCalaisExtractor] Checking if OpenCalais response is cached... ");
-        String response;
+        String response = null;
         if (outfile.isFile() && enableCache) {
             System.out.println("yes");
             response = getCachedResponse(outfile);
         } else {
             System.out.println("no");
-            response = postFile(input, createPostMethod());
 
-            // Sleep for a while in order to prevent OpenCalais error 429 (too many concurrent requests)
-            try {
-                Thread.sleep(sleepTime);
-            } catch(InterruptedException e) {
-                e.printStackTrace();
+            boolean responseOk = false;
+            while(!responseOk) {
+                response = postFile(input, createPostMethod());
+
+                if (response != null) {
+                    // Exit loop
+                    responseOk = true;
+                } else {
+                    // Sleep for a while in order to prevent OpenCalais error 429 (too many concurrent requests)
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch(InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
 
