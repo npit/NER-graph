@@ -10,18 +10,18 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class NamedEntityGraph {
-    private static ArrayList<String> dummyWords;
+    private static ArrayList<String> placeholders;
 
     public static void main(String[] args) {
         // Main variables
         String inputFolder = "texts/input";
 
-        dummyWords = new ArrayList<>();
-        dummyWords.add(".");
-//        dummyWords.add("");
-//        dummyWords.add("-");
-//        dummyWords.add("WOW");
-        dummyWords.add("A");
+        placeholders = new ArrayList<>();
+        placeholders.add(".");
+//        placeholders.add("");
+//        placeholders.add("-");
+//        placeholders.add("WOW");
+        placeholders.add("A");
 
         File input = new File(inputFolder);
         EntityExtractor entityExtractor = new OpenCalaisExtractor();
@@ -64,38 +64,49 @@ public class NamedEntityGraph {
         // Create comparator object
         NGramCachedGraphComparator comparator = new NGramCachedGraphComparator();
 
+        // Declare graph similarity and string objects
+        GraphSimilarity sim;
+        String text1data, text2data;
+
         // Compare with n-gram graphs
         DocumentNGramGraph nGramGraph1 = new DocumentWordGraph();
-        nGramGraph1.setDataString(text1.getText());
-
         DocumentNGramGraph nGramGraph2 = new DocumentWordGraph();
+        nGramGraph1.setDataString(text1.getText());
         nGramGraph2.setDataString(text2.getText());
 
-        GraphSimilarity nGramSimilarity = comparator.getSimilarityBetween(nGramGraph1, nGramGraph2);
+        sim = comparator.getSimilarityBetween(nGramGraph1, nGramGraph2);
 
-        System.out.println("N-gram similarity:\t" + nGramSimilarity.toString());
+        System.out.println("N-gram similarity:\t" + sim.toString());
 
-        // Compare with named entity graph dummy method
-        for (String dummyWord : dummyWords) {
-            String text1Dummy = text1.getEntityTextWithDummyWord(dummyWord);
-            String text2Dummy = text2.getEntityTextWithDummyWord(dummyWord);
+        // Compare with named entity graph placeholder method
+        for (String placeholder : placeholders) {
+            text1data = text1.getEntityTextWithPlaceholders(placeholder);
+            text2data = text2.getEntityTextWithPlaceholders(placeholder);
 
-            GraphSimilarity entitySimilarity = getWordGraphSimilarity(comparator, text1Dummy, text2Dummy);
+            sim = getWordGraphSimilarity(comparator, text1data, text2data);
 
-            System.out.println("Dummy (" + dummyWord + "):\t\t\t" + entitySimilarity.toString());
+            System.out.println("Placeholder (" + placeholder + "):\t" + sim.toString());
         }
 
-        // Compare with named entity graph dummy same size method
-        for (String dummyWord : dummyWords) {
-            String text1Dummy = text1.getEntityTextWithDummyWordSameSize(dummyWord);
-            String text2Dummy = text2.getEntityTextWithDummyWordSameSize(dummyWord);
+        // Compare with named entity graph placeholder same size method
+        for (String placeholder : placeholders) {
+            text1data = text1.getEntityTextWithPlaceholderSameSize(placeholder);
+            text2data = text2.getEntityTextWithPlaceholderSameSize(placeholder);
 
             // Code that gives stack overflow exception:
-            GraphSimilarity entitySimilarity = getWordGraphSimilarity(comparator, text1Dummy, text2Dummy);
+            sim = getWordGraphSimilarity(comparator, text1data, text2data);
 
-            System.out.println("DummySameSize (" + dummyWord + "):\t" + entitySimilarity.toString());
-
+            System.out.println("PHSameSize (" + placeholder + "):\t\t" + sim.toString());
         }
+
+        // Compare with named entity graph random word method
+        text1data = text1.getEntityTextWithRandomWord();
+        text2data = text2.getEntityTextWithRandomWord();
+
+        sim = getWordGraphSimilarity(comparator, text1data, text2data);
+
+        System.out.println("Random words:\t\t" + sim.toString());
+
     }
 
     /**

@@ -54,18 +54,18 @@ public class TextEntities {
     }
 
     /**
-     * Return a string that is the original text, with every word that is not an entity replaced by a dummy word
-     * @param dummyWord Word to replace non-entity words with
-     * @return          Text with non-entity words replaced by the dummy word
+     * Return a string that is the original text, with every word that is not an entity replaced by a placeholder
+     * @param placeholder   Word to replace non-entity words with
+     * @return              Text with non-entity words replaced by the placeholder
      */
-    public String getEntityTextWithDummyWord(String dummyWord) {
+    public String getEntityTextWithPlaceholders(String placeholder) {
         int wordsNum = this.getNumberOfWordsInText();
 
         // Create string that is the same number of words as original text but all words are the dummy word
         ArrayList<String> entityTextWords = new ArrayList<>(wordsNum);
 
         for (int i = 0; i < wordsNum; i++) {
-            entityTextWords.add(i, dummyWord);
+            entityTextWords.add(i, placeholder);
         }
 
         // Replace words that should be entities with their entity names
@@ -81,13 +81,13 @@ public class TextEntities {
     }
 
     /**
-     * Return a string that is the original text, with every non-entity word replaced by a dummy word of the same size.
-     * The dummy word is repeated multiple times until its length exceeds that of the original word and is then trimmed
-     * to be the exact size of the original word.
-     * @param dummyWord Word to replace non-entity words with
-     * @return          The text in the described form
+     * Return a string that is the original text, with every non-entity word replaced by a placeholder of the same size.
+     * The placeholder word is repeated multiple times until its length exceeds that of the original word and is then
+     * trimmed to be the exact size of the original word.
+     * @param placeholder   Word to replace non-entity words with
+     * @return              The text in the described form
      */
-    public String getEntityTextWithDummyWordSameSize(String dummyWord) {
+    public String getEntityTextWithPlaceholderSameSize(String placeholder) {
         int numOfWords = this.getNumberOfWordsInText();
 
         // Create array with the original text's words
@@ -100,7 +100,7 @@ public class TextEntities {
             words.add(tokenIndex++, st.nextToken());
         }
 
-        // Turn all words into dummy words
+        // Turn all words into placeholder words
         for (int i = 0; i < numOfWords; i++) {
             // Get the word to replace and its length
             String word = words.get(i);
@@ -110,7 +110,7 @@ public class TextEntities {
             String newWord = "";
 
             do {
-                newWord += dummyWord;
+                newWord += placeholder;
             } while (newWord.length() <= wordLen);
 
             newWord = newWord.substring(0, wordLen);
