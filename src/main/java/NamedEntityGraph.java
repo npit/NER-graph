@@ -49,10 +49,9 @@ public class NamedEntityGraph {
         String inputFolder = "texts/input";
 
         placeholders = new ArrayList<>();
-        placeholders.add(".");
+//        placeholders.add(".");
 //        placeholders.add("");
 //        placeholders.add("-");
-//        placeholders.add("WOW");
         placeholders.add("A");
 
         File input = new File(inputFolder);
@@ -188,12 +187,12 @@ public class NamedEntityGraph {
         }
 
         // Compare with named entity graph random word method
-        text1data = text1.getEntityTextWithRandomWord();
-        text2data = text2.getEntityTextWithRandomWord();
-
-        sim = getWordGraphSimilarity(comparator, text1data, text2data);
-
-        LOGGER.log(Level.FINE, "Random words:\t\t\t" + sim.toString());
+//        text1data = text1.getEntityTextWithRandomWord();
+//        text2data = text2.getEntityTextWithRandomWord();
+//
+//        sim = getWordGraphSimilarity(comparator, text1data, text2data);
+//
+//        LOGGER.log(Level.FINE, "Random words:\t\t\t" + sim.toString());
     }
 
     /**
