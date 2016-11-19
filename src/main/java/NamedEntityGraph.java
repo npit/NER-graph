@@ -26,6 +26,7 @@ public class NamedEntityGraph {
         File input = new File(inputFolder);
         EntityExtractor entityExtractor = new OpenCalaisExtractor();
         ArrayList<TextEntities> texts = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
 
         try {
             if (input.isDirectory()) {
@@ -73,9 +74,18 @@ public class NamedEntityGraph {
                 try {
                     compareTexts(text1, text2);
                 } catch (StackOverflowError e) {
-                    System.err.println("StackOverflow error!");
+                    errors.add(text1.getTitle() + " (" + text1.getEntities().size() + " entities) & " + text2.getTitle() + "(" + text2.getEntities().size() + " entities)");
                 }
                 System.out.println();
+            }
+        }
+
+        // Print any errors that occurred
+        if (errors.size() > 0) {
+            System.err.println("Errors:");
+
+            for (String error : errors) {
+                System.err.println(error);
             }
         }
     }
