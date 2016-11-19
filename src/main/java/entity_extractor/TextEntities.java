@@ -98,6 +98,7 @@ public class TextEntities {
             words.add(tokenIndex++, st.nextToken());
         }
 
+        // Turn all words into dummy words
         for (int i = 0; i < numOfWords; i++) {
             // Get the word to replace and its length
             String word = words.get(i);
@@ -113,6 +114,13 @@ public class TextEntities {
             newWord = newWord.substring(0, wordLen);
 
             words.set(i, newWord);
+        }
+        
+        // Add entity names back to the text
+        for (ExtractedEntity e : this.entities) {
+            int entityIndex = this.getEntityIndex(e.getOffset());
+
+            words.set(entityIndex, e.getName());
         }
 
         return getStringFromArrayList(words);
