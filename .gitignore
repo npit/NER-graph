@@ -24,6 +24,7 @@ target/
 #general swap/backup/script files
 *.so
 *.log
+*.log.lck
 *.out
 *~
 *.swp
