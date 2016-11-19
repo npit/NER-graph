@@ -52,7 +52,18 @@ public class NamedEntityGraph {
             e.printStackTrace();
         }
 
-        compareTexts(texts.get(0), texts.get(1));
+        // Compare every text with every other text
+        int textsLen = texts.size();
+        for (int i = 0; i < textsLen - 1; i++) {
+            for (int j = i + 1; j < textsLen; j++) {
+                TextEntities text1 = texts.get(i);
+                TextEntities text2 = texts.get(j);
+
+                System.out.println("Comparing " + text1.getTitle() + " with " + text2.getTitle());
+                compareTexts(text1, text2);
+                System.out.println();
+            }
+        }
     }
 
     /**
