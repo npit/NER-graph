@@ -50,6 +50,8 @@ public class NamedEntityGraph {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            System.err.println("Not comparing anything, there was an error");
+            return;
         }
 
         // Compare every text with every other text
