@@ -8,6 +8,8 @@ import utils.VerySimpleFormatter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.*;
 
 public class NamedEntityGraph {
@@ -101,37 +103,26 @@ public class NamedEntityGraph {
         LOGGER.log(Level.INFO, "Starting text comparisons...");
 
         int textsLen = texts.size();
-        int totalComparisons = textsLen * (textsLen - 1) / 2;
-        int comparisonsDone = 0;
-        ArrayList<Thread> myThreads = new ArrayList<>();
-
         int cores = Runtime.getRuntime().availableProcessors();
         LOGGER.log(Level.INFO, "Using " + cores + " cores...");
 
-        for (int i = 0; i < textsLen - 1; i += cores) {
-            int comparisonsForTheseThreads = 0;
-            for (int h = 0; h < cores; h++) {
-                if (i + h < textsLen) {
-                    comparisonsForTheseThreads += textsLen - (i + 1);
-                    MyRunnable r = new MyRunnable(i + h, textsLen, placeholders, errors, texts);
-                    Thread t = new Thread(r);
-                    myThreads.add(t);
+        ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(cores);
 
-                    t.start();
-                }
+        for (int i = 0; i < textsLen - 1; i++) {
+            MyRunnable r = new MyRunnable(i, textsLen, placeholders, errors, texts);
+            executor.execute(r);
+        }
+
+        executor.shutdown();
+
+        // While waiting for the threads to complete, print progress every 20 seconds
+        while (!executor.isTerminated()) {
+            try {
+                Thread.sleep(20000);
+            } catch(InterruptedException e) {
+                e.printStackTrace();
             }
-
-            // wait all threads to finish
-            for (Thread t : myThreads) {
-                try {
-                    t.join();
-                } catch(InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            comparisonsDone += comparisonsForTheseThreads;
-            LOGGER.log(Level.INFO, String.format("Progress: %.2f%% - " + comparisonsDone + "/" + totalComparisons + " comparisons", Percentage.percent(comparisonsDone, totalComparisons)));
+            System.out.println("Completed tasks: " + executor.getCompletedTaskCount() + " / " + executor.getTaskCount());
         }
 
         // Print any errors that occurred
