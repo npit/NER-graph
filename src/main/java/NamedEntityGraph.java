@@ -30,7 +30,7 @@ public class NamedEntityGraph {
         }
     }
 
-    public void start() throws IOException {
+    private void start() throws IOException {
         // Setup logger
         LOGGER.setLevel(Level.FINEST);
         LOGGER.setUseParentHandlers(false);

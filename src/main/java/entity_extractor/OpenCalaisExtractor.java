@@ -24,8 +24,8 @@ public class OpenCalaisExtractor implements EntityExtractor {
 
     private final Logger LOGGER = Logger.getLogger("NamedEntityGraph");
     private final ArrayList<String> apiKeys;
-    private File output;
-    private HttpClient client;
+    private final File output;
+    private final HttpClient client;
 
     public OpenCalaisExtractor() {
         // Setup client

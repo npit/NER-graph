@@ -12,7 +12,7 @@ public class TextEntities {
     private final static String wordSeparator = " ";
     private final static String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    private ArrayList<ExtractedEntity> entities;
+    private final ArrayList<ExtractedEntity> entities;
     private String text;
     private String title;
 

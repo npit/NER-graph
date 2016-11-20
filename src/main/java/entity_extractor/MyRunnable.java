@@ -17,9 +17,9 @@ public class MyRunnable implements Runnable {
     private final List<Integer> work;
     private final ArrayList<String> errors;
     private final int id;
-    private int textsLen;
-    private ArrayList<String> placeholders;
-    private ArrayList<TextEntities> texts;
+    private final int textsLen;
+    private final ArrayList<String> placeholders;
+    private final ArrayList<TextEntities> texts;
     private String myLog;
 
     public MyRunnable(int id, List<Integer> work, int textsLen, ArrayList<String> placeholders, ArrayList<String> errors, ArrayList<TextEntities> texts) {
