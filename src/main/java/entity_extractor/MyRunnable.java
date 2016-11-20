@@ -4,22 +4,27 @@ import gr.demokritos.iit.jinsect.documentModel.comparators.NGramCachedGraphCompa
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentWordGraph;
 import gr.demokritos.iit.jinsect.structs.GraphSimilarity;
+import utils.Percentage;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MyRunnable implements Runnable {
     private final Logger LOGGER = Logger.getLogger("NamedEntityGraph");
 
-    private int i, textsLen;
-    private ArrayList<String> placeholders;
+    private final List<Integer> work;
     private final ArrayList<String> errors;
+    private final int id;
+    private int textsLen;
+    private ArrayList<String> placeholders;
     private ArrayList<TextEntities> texts;
     private String myLog;
 
-    public MyRunnable(int i, int textsLen, ArrayList<String> placeholders, ArrayList<String> errors, ArrayList<TextEntities> texts) {
-        this.i = i;
+    public MyRunnable(int id, List<Integer> work, int textsLen, ArrayList<String> placeholders, ArrayList<String> errors, ArrayList<TextEntities> texts) {
+        this.id = id;
+        this.work = work;
         this.textsLen = textsLen;
         this.placeholders = placeholders;
         this.errors = errors;
@@ -28,23 +33,41 @@ public class MyRunnable implements Runnable {
 
     @Override
     public void run() {
-        for (int j = i + 1; j < textsLen; j++) {
-            myLog = "";
-
-            TextEntities text1 = texts.get(i);
-            TextEntities text2 = texts.get(j);
-
-            myLog += "Comparing " + text1.getTitle() + " with " + text2.getTitle() + "\n";
-
-            try {
-                compareTexts(text1, text2);
-            } catch (StackOverflowError e) {
-                synchronized (errors) {
-                    errors.add(text1.getTitle() + " & " + text2.getTitle());
-                }
-            }
-            LOGGER.log(Level.FINE, myLog);
+        int comparisonsToDo = 0;
+        for (Integer i : work) {
+            comparisonsToDo += textsLen - i - 1;
         }
+
+        int comparisonsDone = 0;
+
+        LOGGER.log(Level.INFO, "[Worker " + id + "] Going to do " + comparisonsToDo + " text comparisons");
+
+        for (Integer i : work) {
+            // Do the comparisons for this i
+            for (int j = i + 1; j < textsLen; j++) {
+                myLog = "";
+
+                TextEntities text1 = texts.get(i);
+                TextEntities text2 = texts.get(j);
+
+                myLog += "Comparing " + text1.getTitle() + " with " + text2.getTitle() + "\n";
+
+                try {
+                    compareTexts(text1, text2);
+                } catch (StackOverflowError e) {
+                    synchronized (errors) {
+                        errors.add(text1.getTitle() + " & " + text2.getTitle());
+                    }
+                }
+                LOGGER.log(Level.FINE, myLog);
+            }
+
+            // Print progress
+            comparisonsDone += textsLen - i - 1;
+            LOGGER.log(Level.INFO, String.format("[Worker " + id + "] Progress: %.3f%%", Percentage.percent(comparisonsDone, comparisonsToDo)));
+        }
+
+        LOGGER.log(Level.INFO, "[Worker " + id + "] Finished");
     }
 
     /**

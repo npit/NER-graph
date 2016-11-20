@@ -8,8 +8,10 @@ import utils.VerySimpleFormatter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 
 public class NamedEntityGraph {
@@ -106,23 +108,32 @@ public class NamedEntityGraph {
         int cores = Runtime.getRuntime().availableProcessors();
         LOGGER.log(Level.INFO, "Using " + cores + " cores...");
 
+        List<List<Integer>> threadWork = new ArrayList<>(cores);
+        for (int core = 0; core < cores; core++) {
+            threadWork.add(core, new ArrayList<Integer>());
+        }
+
         ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(cores);
 
+        // Divide work between the available processors
         for (int i = 0; i < textsLen - 1; i++) {
-            MyRunnable r = new MyRunnable(i, textsLen, placeholders, errors, texts);
+            // Select which thread should do these comparisons
+            threadWork.get(i % cores).add(i);
+        }
+
+        // Start a thread for each CPU
+        for (int i = 0; i < cores; i++) {
+            MyRunnable r = new MyRunnable(i, threadWork.get(i), textsLen, placeholders, errors, texts);
             executor.execute(r);
         }
 
+        // Wait for threads to finish before continuing
         executor.shutdown();
 
-        // While waiting for the threads to complete, print progress every 20 seconds
-        while (!executor.isTerminated()) {
-            try {
-                Thread.sleep(20000);
-            } catch(InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Completed tasks: " + executor.getCompletedTaskCount() + " / " + executor.getTaskCount());
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         // Print any errors that occurred
