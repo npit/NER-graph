@@ -7,24 +7,23 @@ import gr.demokritos.iit.jinsect.structs.GraphSimilarity;
 import utils.Percentage;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MyRunnable implements Runnable {
     private final Logger LOGGER = Logger.getLogger("NamedEntityGraph");
 
-    private final List<Integer> work;
     private final ArrayList<String> errors;
     private final int id;
+    private final int cores;
     private final int textsLen;
     private final ArrayList<String> placeholders;
     private final ArrayList<TextEntities> texts;
     private String myLog;
 
-    public MyRunnable(int id, List<Integer> work, int textsLen, ArrayList<String> placeholders, ArrayList<String> errors, ArrayList<TextEntities> texts) {
+    public MyRunnable(int id, int cores, int textsLen, ArrayList<String> placeholders, ArrayList<String> errors, ArrayList<TextEntities> texts) {
         this.id = id;
-        this.work = work;
+        this.cores = cores;
         this.textsLen = textsLen;
         this.placeholders = placeholders;
         this.errors = errors;
@@ -33,16 +32,21 @@ public class MyRunnable implements Runnable {
 
     @Override
     public void run() {
+        ArrayList<Integer> compGroups = new ArrayList<>();
         int comparisonsToDo = 0;
-        for (Integer i : work) {
-            comparisonsToDo += textsLen - i - 1;
-        }
 
-        int comparisonsDone = 0;
+        // Find which comparisons to do
+        for (int i = id; i < textsLen - 1; i++) {
+            if (i % cores == id) {
+                comparisonsToDo += textsLen - i - 1;
+                compGroups.add(i);
+            }
+        }
 
         LOGGER.log(Level.INFO, "[Worker " + id + "] Going to do " + comparisonsToDo + " text comparisons");
 
-        for (Integer i : work) {
+        int comparisonsDone = 0;
+        for (Integer i : compGroups) {
             // Do the comparisons for this i
             for (int j = i + 1; j < textsLen; j++) {
                 myLog = "";

@@ -108,22 +108,11 @@ public class NamedEntityGraph {
         int cores = Runtime.getRuntime().availableProcessors();
         LOGGER.log(Level.INFO, "Using " + cores + " cores...");
 
-        List<List<Integer>> threadWork = new ArrayList<>(cores);
-        for (int core = 0; core < cores; core++) {
-            threadWork.add(core, new ArrayList<Integer>());
-        }
-
         ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(cores);
-
-        // Divide work between the available processors
-        for (int i = 0; i < textsLen - 1; i++) {
-            // Select which thread should do these comparisons
-            threadWork.get(i % cores).add(i);
-        }
 
         // Start a thread for each CPU
         for (int i = 0; i < cores; i++) {
-            MyRunnable r = new MyRunnable(i, threadWork.get(i), textsLen, placeholders, errors, texts);
+            MyRunnable r = new MyRunnable(i, cores, textsLen, placeholders, errors, texts);
             executor.execute(r);
         }
 
