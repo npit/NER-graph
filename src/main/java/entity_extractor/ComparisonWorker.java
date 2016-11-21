@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MyRunnable implements Runnable {
+public class ComparisonWorker implements Runnable {
     private final Logger LOGGER = Logger.getLogger("NamedEntityGraph");
 
     private final ArrayList<String> errors;
@@ -21,7 +21,7 @@ public class MyRunnable implements Runnable {
     private final ArrayList<TextEntities> texts;
     private String myLog;
 
-    public MyRunnable(int id, int cores, int textsLen, ArrayList<String> placeholders, ArrayList<String> errors, ArrayList<TextEntities> texts) {
+    public ComparisonWorker(int id, int cores, int textsLen, ArrayList<String> placeholders, ArrayList<String> errors, ArrayList<TextEntities> texts) {
         this.id = id;
         this.cores = cores;
         this.textsLen = textsLen;

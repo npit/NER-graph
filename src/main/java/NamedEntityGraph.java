@@ -1,5 +1,5 @@
 import entity_extractor.EntityExtractor;
-import entity_extractor.MyRunnable;
+import entity_extractor.ComparisonWorker;
 import entity_extractor.OpenCalaisExtractor;
 import entity_extractor.TextEntities;
 import utils.Percentage;
@@ -8,7 +8,6 @@ import utils.VerySimpleFormatter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -112,7 +111,7 @@ public class NamedEntityGraph {
 
         // Start a thread for each CPU
         for (int i = 0; i < cores; i++) {
-            MyRunnable r = new MyRunnable(i, cores, textsLen, placeholders, errors, texts);
+            ComparisonWorker r = new ComparisonWorker(i, cores, textsLen, placeholders, errors, texts);
             executor.execute(r);
         }
 
