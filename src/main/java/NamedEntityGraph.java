@@ -1,13 +1,12 @@
+import csv_export.ComparisonContainer;
+import csv_export.ComparisonResult;
 import entity_extractor.*;
 import utils.Percentage;
 import utils.VerySimpleFormatter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -17,9 +16,6 @@ public class NamedEntityGraph {
     private final static boolean cacheGraphs = true;
 
     private final Logger LOGGER = Logger.getLogger("NamedEntityGraph");
-    private ArrayList<String> placeholders;
-    private Handler consoleHandler = null;
-    private Handler fileHandler = null;
 
     public static void main(String[] args) {
         NamedEntityGraph neg = new NamedEntityGraph();
@@ -37,12 +33,12 @@ public class NamedEntityGraph {
         LOGGER.setUseParentHandlers(false);
 
         // Add handlers to the logger
-        consoleHandler = new ConsoleHandler();
+        Handler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.INFO);
         consoleHandler.setFormatter(new VerySimpleFormatter());
         LOGGER.addHandler(consoleHandler);
 
-        fileHandler = new FileHandler("./neg.log");
+        Handler fileHandler = new FileHandler("./neg.log");
         fileHandler.setLevel(Level.FINEST);
         fileHandler.setFormatter(new VerySimpleFormatter());
         LOGGER.addHandler(fileHandler);
@@ -50,7 +46,7 @@ public class NamedEntityGraph {
         // Main variables
         String inputFolder = "texts/input";
 
-        placeholders = new ArrayList<>();
+        ArrayList<String> placeholders = new ArrayList<>();
 //        placeholders.add(".");
 //        placeholders.add("");
 //        placeholders.add("-");
@@ -114,6 +110,9 @@ public class NamedEntityGraph {
         // Compare every text with every other text
         LOGGER.log(Level.INFO, "Starting text comparisons...");
 
+        // List to keep all comparisons that were made to write them to CSV file
+        List<ComparisonContainer> comparisons = Collections.synchronizedList(new ArrayList<ComparisonContainer>());
+
         int textsLen = texts.size();
         int cores = Runtime.getRuntime().availableProcessors();
         LOGGER.log(Level.INFO, "Using " + cores + " cores...");
@@ -122,7 +121,7 @@ public class NamedEntityGraph {
 
         // Start a thread for each CPU core
         for (int i = 0; i < cores; i++) {
-            ComparisonWorker r = new ComparisonWorker(i, cores, textsLen, placeholders, errors, texts, graphs);
+            ComparisonWorker r = new ComparisonWorker(i, cores, textsLen, placeholders, errors, texts, graphs, comparisons);
             executor.execute(r);
         }
 
@@ -142,6 +141,18 @@ public class NamedEntityGraph {
             for (String error : errors) {
                 LOGGER.log(Level.SEVERE, error);
             }
+        }
+
+        // Export to CSV
+        //todo
+        for (ComparisonContainer cont : comparisons) {
+            String log = cont.getText1() + " + " + cont.getText2() + " ";
+            for (ComparisonResult res : cont.getResults()) {
+                log += " | value: " + res.getValueSim();
+                log += " | containment: " + res.getContainmentSim();
+                log += " | size: " + res.getSizeSim();
+            }
+            LOGGER.log(Level.INFO, log);
         }
     }
 }
