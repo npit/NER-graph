@@ -17,7 +17,7 @@ public class CSVExporter {
 
         try{
             PrintWriter writer = new PrintWriter(filename, "UTF-8");
-            writer.println("sep=" + separator);
+//            writer.println("sep=" + separator);
 
             // Print header for text titles
             writer.print("Text 1, Text 2,");
