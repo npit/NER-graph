@@ -88,8 +88,8 @@ public class ComparisonWorker implements Runnable {
         String text1data, text2data;
 
         // Compare with n-gram graphs
-        DocumentNGramGraph nGramGraph1 = new DocumentWordGraph();
-        DocumentNGramGraph nGramGraph2 = new DocumentWordGraph();
+        DocumentNGramGraph nGramGraph1 = new DocumentNGramGraph();
+        DocumentNGramGraph nGramGraph2 = new DocumentNGramGraph();
         nGramGraph1.setDataString(text1.getText());
         nGramGraph2.setDataString(text2.getText());
 
