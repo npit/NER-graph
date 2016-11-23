@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 
 public class NamedEntityGraph {
+    private final static boolean cacheGraphs = true;
+
     private final Logger LOGGER = Logger.getLogger("NamedEntityGraph");
     private ArrayList<String> placeholders;
     private Handler consoleHandler = null;
@@ -87,9 +89,11 @@ public class NamedEntityGraph {
 //                            entities.printEntities();
                             texts.add(entities);
 
-                            // Calculate graphs for this text and save them
-                            GraphCache cache = new GraphCache();
-                            cache.calculateGraphs(entities, placeholders);
+                            // Calculate graphs for this text and save them (if caching is enabled)
+                            GraphCache cache = new GraphCache(entities);
+                            if (cacheGraphs) {
+                                cache.calculateGraphs(entities, placeholders);
+                            }
                             graphs.put(entities.getTitle(), cache);
 
                             LOGGER.log(Level.FINE, "[main] Got " + entities.getEntities().size() + " extracted entities from " + file + "\n");

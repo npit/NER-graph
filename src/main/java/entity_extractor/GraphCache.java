@@ -14,12 +14,23 @@ public class GraphCache {
     private Map<String, DocumentWordGraph> wordGraphPH;
     private Map<String, DocumentWordGraph> wordGraphPHSS;
     private DocumentWordGraph wordGraphRand;
+    private TextEntities text;
 
-    public GraphCache() {
-        wordGraphPH = new HashMap<>();
-        wordGraphPHSS = new HashMap<>();
+    public GraphCache(TextEntities text) {
+        this.wordGraphPH = new HashMap<>();
+        this.wordGraphPHSS = new HashMap<>();
+        this.nGramNormalText = null;
+        this.wordGraphNormalText = null;
+        this.wordGraphRand = null;
+
+        this.text = text;
     }
 
+    /**
+     * Calculate graphs for all methods and save them. Takes up a lot of memory...
+     * @param te            TextEntities object for the text
+     * @param placeholders  Placeholders to use for methods that replace words with placeholders
+     */
     public void calculateGraphs(TextEntities te, List<String> placeholders) {
         // N-gram graph for the normal text
         nGramNormalText = new DocumentNGramGraph();
@@ -46,23 +57,80 @@ public class GraphCache {
         wordGraphRand.setDataString(te.getEntityTextWithRandomWord());
     }
 
+    /**
+     * Return an n-gram graph of the normal text. If it does not exist, create it and return it
+     * @return  N-gram graph
+     */
     public DocumentNGramGraph getnGramNormalText() {
-        return nGramNormalText;
+        if (nGramNormalText == null) {
+            DocumentNGramGraph g = new DocumentNGramGraph();
+            g.setDataString(text.getText());
+
+            return g;
+        } else {
+            return nGramNormalText;
+        }
     }
 
+    /**
+     * Return a word graph of the normal text. If it does not exist, create it and return it
+     * @return  Word graph
+     */
     public DocumentWordGraph getWordGraphNormalText() {
-        return wordGraphNormalText;
+        if (wordGraphNormalText == null) {
+            DocumentWordGraph g = new DocumentWordGraph();
+            g.setDataString(text.getText());
+
+            return g;
+        } else {
+            return wordGraphNormalText;
+        }
     }
 
+    /**
+     * Return a word graph of the placeholder method text. If it does not exist, create it and return it
+     * @param placeholder   Placeholder to use in text
+     * @return              Word graph
+     */
     public DocumentWordGraph getWordGraphPH(String placeholder) {
-        return wordGraphPH.get(placeholder);
+        DocumentWordGraph g = wordGraphPH.get(placeholder);
+
+        if (g == null) {
+            g = new DocumentWordGraph();
+            g.setDataString(text.getEntityTextWithPlaceholders(placeholder));
+        }
+
+        return g;
     }
 
+    /**
+     * Return a word graph of the placeholder same size method text. If it does not exist, create it and return it
+     * @param placeholder   Placeholder to use in text
+     * @return              Word graph
+     */
     public DocumentWordGraph getWordGraphPHSS(String placeholder) {
-        return wordGraphPHSS.get(placeholder);
+        DocumentWordGraph g = wordGraphPHSS.get(placeholder);
+
+        if (g == null) {
+            g = new DocumentWordGraph();
+            g.setDataString(text.getEntityTextWithPlaceholderSameSize(placeholder));
+        }
+
+        return g;
     }
 
+    /**
+     * Return a word graph of the random method text. If it does not exist, create it and return it
+     * @return  Word graph
+     */
     public DocumentWordGraph getWordGraphRand() {
-        return wordGraphRand;
+        if (wordGraphRand == null) {
+            DocumentWordGraph g = new DocumentWordGraph();
+            g.setDataString(text.getEntityTextWithRandomWord());
+
+            return g;
+        } else {
+            return wordGraphRand;
+        }
     }
 }
