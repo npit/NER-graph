@@ -1,5 +1,5 @@
+import csv_export.CSVExporter;
 import csv_export.ComparisonContainer;
-import csv_export.ComparisonResult;
 import entity_extractor.*;
 import utils.Percentage;
 import utils.VerySimpleFormatter;
@@ -144,15 +144,6 @@ public class NamedEntityGraph {
         }
 
         // Export to CSV
-        //todo
-        for (ComparisonContainer cont : comparisons) {
-            String log = cont.getText1() + " + " + cont.getText2() + " ";
-            for (ComparisonResult res : cont.getResults()) {
-                log += " | value: " + res.getValueSim();
-                log += " | containment: " + res.getContainmentSim();
-                log += " | size: " + res.getSizeSim();
-            }
-            LOGGER.log(Level.INFO, log);
-        }
+        CSVExporter.exportCSV("out.csv", placeholders, comparisons);
     }
 }
