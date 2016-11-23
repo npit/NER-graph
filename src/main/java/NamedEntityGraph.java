@@ -1,13 +1,13 @@
-import entity_extractor.EntityExtractor;
-import entity_extractor.ComparisonWorker;
-import entity_extractor.OpenCalaisExtractor;
-import entity_extractor.TextEntities;
+import entity_extractor.*;
 import utils.Percentage;
 import utils.VerySimpleFormatter;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -57,6 +57,7 @@ public class NamedEntityGraph {
         File input = new File(inputFolder);
         EntityExtractor entityExtractor = new OpenCalaisExtractor();
         ArrayList<TextEntities> texts = new ArrayList<>();
+        Map<String, GraphCache> graphs = new HashMap<>();
         ArrayList<String> errors = new ArrayList<>();
 
         try {
@@ -71,19 +72,25 @@ public class NamedEntityGraph {
 
                     for (File file : files) {
                         if (file.isFile()) {
+                            // Log the progress so far
                             currPercent = Percentage.percent(i, totalFiles);
                             Level lvl = Level.FINE;
-                            if (currPercent - percentage > 1) {
+                            if (currPercent - percentage > 1.0) {
                                 lvl = Level.INFO;
                                 percentage = currPercent;
                             }
 
                             LOGGER.log(lvl, String.format("[main] (" + i + "/" + files.length + " - %.2f%%) Getting entities for " + file + "", currPercent));
 
+                            // Get entities for this file and save them
                             TextEntities entities = entityExtractor.getEntities(file);
 //                            entities.printEntities();
-
                             texts.add(entities);
+
+                            // Calculate graphs for this text and save them
+                            GraphCache cache = new GraphCache();
+                            cache.calculateGraphs(entities, placeholders);
+                            graphs.put(entities.getTitle(), cache);
 
                             LOGGER.log(Level.FINE, "[main] Got " + entities.getEntities().size() + " extracted entities from " + file + "\n");
                         } else {
@@ -95,7 +102,7 @@ public class NamedEntityGraph {
                 }
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, e.getStackTrace().toString());
+            LOGGER.log(Level.SEVERE, Arrays.toString(e.getStackTrace()));
             LOGGER.log(Level.SEVERE, "Not comparing anything, there was an error");
             return;
         }
@@ -111,7 +118,7 @@ public class NamedEntityGraph {
 
         // Start a thread for each CPU core
         for (int i = 0; i < cores; i++) {
-            ComparisonWorker r = new ComparisonWorker(i, cores, textsLen, placeholders, errors, texts);
+            ComparisonWorker r = new ComparisonWorker(i, cores, textsLen, placeholders, errors, texts, graphs);
             executor.execute(r);
         }
 
