@@ -53,6 +53,11 @@ public class TextEntities {
         System.out.println("Number of words in text: " + getNumberOfWordsInText());
     }
 
+    /**
+     * Join an array list of strings into a single string, each string separated from each other with the wordSeparator
+     * @param stringList    List of strings
+     * @return              List of strings joined to a single string
+     */
     private String getStringFromArrayList(ArrayList<String> stringList) {
         StringBuilder sb = new StringBuilder();
         for (String word : stringList) {
@@ -81,9 +86,8 @@ public class TextEntities {
         // Replace words that should be entities with their entity names
         for (ExtractedEntity e : entities) {
             int index = getEntityIndex(e.getOffset());
-            String entityText = e.getName();
 
-            entityTextWords.set(index, entityText);
+            entityTextWords.set(index, e.getHash());
         }
 
         // Create string from the array list
@@ -132,7 +136,7 @@ public class TextEntities {
         for (ExtractedEntity e : this.entities) {
             int entityIndex = this.getEntityIndex(e.getOffset());
 
-            words.set(entityIndex, e.getName());
+            words.set(entityIndex, e.getHash());
         }
 
         return getStringFromArrayList(words);
@@ -180,7 +184,7 @@ public class TextEntities {
         for (ExtractedEntity e : this.entities) {
             int entityIndex = this.getEntityIndex(e.getOffset());
 
-            words.set(entityIndex, e.getName());
+            words.set(entityIndex, e.getHash());
         }
 
         return getStringFromArrayList(words);

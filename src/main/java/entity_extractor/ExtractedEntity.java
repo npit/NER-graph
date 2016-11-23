@@ -3,6 +3,7 @@ package entity_extractor;
 /**
  * An extracted entity from a text
  */
+@SuppressWarnings("WeakerAccess")
 public class ExtractedEntity {
     private String name;
     private String type;
@@ -49,6 +50,14 @@ public class ExtractedEntity {
 
     public void setLength(int length) {
         this.length = length;
+    }
+
+    /**
+     * Return a hash string for this entity's name. It is assumed that same name == same entity IRL
+     * @return  Hash string
+     */
+    public String getHash() {
+        return "" + name.hashCode();
     }
 
     @Override

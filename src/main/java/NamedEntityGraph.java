@@ -109,7 +109,7 @@ public class NamedEntityGraph {
 
         ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(cores);
 
-        // Start a thread for each CPU
+        // Start a thread for each CPU core
         for (int i = 0; i < cores; i++) {
             ComparisonWorker r = new ComparisonWorker(i, cores, textsLen, placeholders, errors, texts);
             executor.execute(r);
