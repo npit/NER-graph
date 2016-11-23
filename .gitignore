@@ -36,3 +36,6 @@ target/
 
 # texts folder for input/output texts
 texts/
+
+# exported csv
+*.csv
