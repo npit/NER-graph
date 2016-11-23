@@ -78,7 +78,7 @@ public class ComparisonWorker implements Runnable {
     /**
      * Compare texts in various ways
      * @param title1    Title of first text to compare
-     * @param title2    Title fo second text to compare
+     * @param title2    Title of second text to compare
      */
     private void compareTexts(String title1, String title2) {
         // Create comparator and graph similarity objects
@@ -94,7 +94,7 @@ public class ComparisonWorker implements Runnable {
 
         // Compare normal texts with word graphs
         sim = comparator.getSimilarityBetween(text1Graphs.getWordGraphNormalText(), text2Graphs.getWordGraphNormalText());
-        myLog += "WordGraph similarity:\t" + sim.toString() + "\n";
+        myLog += "Word similarity:\t" + sim.toString() + "\n";
 
         // Compare with named entity graph placeholder method
         for (String ph : placeholders) {
@@ -110,6 +110,6 @@ public class ComparisonWorker implements Runnable {
 
         // Compare with named entity graph random word method
         sim = comparator.getSimilarityBetween(text1Graphs.getWordGraphRand(), text2Graphs.getWordGraphRand());
-        myLog += "Random words:\t\t\t" + sim.toString() + "\n";
+        myLog += "Random words:\t\t" + sim.toString() + "\n";
     }
 }
