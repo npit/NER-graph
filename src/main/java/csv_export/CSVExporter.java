@@ -20,7 +20,7 @@ public class CSVExporter {
 //            writer.println("sep=" + separator);
 
             // Print header for text titles
-            writer.print("Text 1, Text 2,");
+            writer.print("Text 1,Text 2,");
 
             List<String> comparisons = new ArrayList<>();
 
@@ -35,18 +35,28 @@ public class CSVExporter {
             }
             comparisons.add("rand");
 
-            // Create headers with graph similarity measure
+            // Create headers with graph similarity measures for each comparison
             sb = new StringBuilder();
 
             for (String s : comparisons) {
+                // Value similarity header
                 sb.append(s);
                 sb.append(" val");
                 sb.append(separator);
+
+                // Containment similarity header
                 sb.append(s);
                 sb.append(" cont");
                 sb.append(separator);
+
+                // Size similarity header
                 sb.append(s);
                 sb.append(" size");
+                sb.append(separator);
+
+                // Normalized value similarity header
+                sb.append(s);
+                sb.append(" NVS");
                 sb.append(separator);
             }
 
@@ -70,6 +80,8 @@ public class CSVExporter {
                     sb.append(res.getContainmentSim());
                     sb.append(separator);
                     sb.append(res.getSizeSim());
+                    sb.append(separator);
+                    sb.append(res.getNVS());
                     sb.append(separator);
                 }
 

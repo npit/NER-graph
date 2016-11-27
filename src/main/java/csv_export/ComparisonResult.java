@@ -37,4 +37,8 @@ public class ComparisonResult {
     public void setSizeSim(double sizeSim) {
         this.sizeSim = sizeSim;
     }
+
+    public double getNVS() {
+        return this.sizeSim == 0 ? 0.0 : (this.valueSim / this.sizeSim);
+    }
 }
