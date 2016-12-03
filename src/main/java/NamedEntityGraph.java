@@ -115,6 +115,9 @@ public class NamedEntityGraph {
 
         int textsLen = texts.size();
         int cores = Runtime.getRuntime().availableProcessors();
+        if (cores > 1) {
+            cores -= 1;
+        }
         LOGGER.log(Level.INFO, "Using " + cores + " cores...");
 
         ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(cores);
