@@ -51,18 +51,40 @@ def main():
     path = "../texts/input/"
     csv_path = "../out.csv"
 
+    temp_file = "temp.csv"
+
     # Get the "category" of each text from the DC.coverage attribute of MUC3
     text_categories = get_text_categories(path)
 
     # Check that the CSV to read exists
     if os.path.isfile(csv_path):
         with open(csv_path) as f:
-            # Read the CSV
-            reader = csv.reader(f, delimiter=",", quoting=csv.QUOTE_NONE)
+            with open(temp_file, "w", newline="") as out:
+                # Read the CSV
+                reader = csv.reader(f, delimiter=",", quoting=csv.QUOTE_NONE)
+                writer = csv.writer(out, delimiter=",", quoting=csv.QUOTE_NONE)
 
-            for row in reader:
-                # TODO: add info to the row and print to new file
-                print(row)
+                # Add headers to the new csv file
+                headers = next(reader)
+                headers.append("GOLD")
+                writer.writerow(headers)
+
+                # Read data rows
+                for row in reader:
+                    # Get text titles
+                    text1 = row[0]
+                    text2 = row[1]
+
+                    # If text categories are the same, write a 1, otherwise 0
+                    new_row = row
+
+                    if text_categories[text1] == text_categories[text2]:
+                        new_row.append(1)
+                    else:
+                        new_row.append(0)
+
+                    # Write this row to the new csv
+                    writer.writerow(new_row)
 
 
 if __name__ == '__main__':
