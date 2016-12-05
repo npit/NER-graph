@@ -26,8 +26,8 @@ public class ClusterTest {
 
             // Skip headers (this var. should be used later to select which comparison to make clusters with)
             String[] headers = br.readLine().split(",");
-            int colToCluster = askForColumnID(headers);
-//            int colToCluster = 13;
+//            int colToCluster = askForColumnID(headers);
+            int colToCluster = 13;
 
             while ((line = br.readLine()) != null) {
                 // process the line.
@@ -51,6 +51,8 @@ public class ClusterTest {
                         textIds[i] = textMap.get(textTitle);
                     }
 
+                    // TODO: Here we have the IDs of the texts, get the appropriate value from the column
+                    double similarityValue = Double.valueOf(fields[colToCluster]);
                 } else {
                     System.err.println("Error... Not even 3 fields in CSV?");
                 }
@@ -58,7 +60,6 @@ public class ClusterTest {
 
             // Print the list of texts and their IDs
             printKeys(textMap);
-
         } catch (Exception e) {
             System.err.println(e.toString());
         }
@@ -74,7 +75,7 @@ public class ClusterTest {
 
         // Ask for ID
 
-        while(id > columns.length - 1) {
+        while(id > columns.length - 1 || id == 0 || id == 1) {
             System.out.print("Enter number of column to cluster: ");
             id = new Scanner(System.in).nextInt();
         }
@@ -96,7 +97,6 @@ public class ClusterTest {
 
         // Add each item to its index
         for (String s : map.keySet()) {
-            System.out.println("adding " + s + " to index " + map.get(s));
             strings.set(map.get(s), s);
         }
 
