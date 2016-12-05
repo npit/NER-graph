@@ -1,7 +1,9 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public class ClusterTest {
     private final static String csvPath = "MUC3_python/temp.csv";
@@ -23,7 +25,9 @@ public class ClusterTest {
             int[] textIds;
 
             // Skip headers (this var. should be used later to select which comparison to make clusters with)
-            String headers = br.readLine();
+            String[] headers = br.readLine().split(",");
+            int colToCluster = askForColumnID(headers);
+//            int colToCluster = 13;
 
             while ((line = br.readLine()) != null) {
                 // process the line.
@@ -51,8 +55,55 @@ public class ClusterTest {
                     System.err.println("Error... Not even 3 fields in CSV?");
                 }
             }
+
+            // Print the list of texts and their IDs
+            printKeys(textMap);
+
         } catch (Exception e) {
             System.err.println(e.toString());
+        }
+    }
+
+    private int askForColumnID(String[] columns) {
+        int id = columns.length;
+
+        // Print columns
+        for (int i = 2; i < id; i++) {
+            System.out.println(i + ") " + columns[i]);
+        }
+
+        // Ask for ID
+
+        while(id > columns.length - 1) {
+            System.out.print("Enter number of column to cluster: ");
+            id = new Scanner(System.in).nextInt();
+        }
+
+        return id;
+    }
+
+    /**
+     * Print the list of texts and their IDs (sorted by ID)
+     * @param map   The map of text titles & IDs
+     */
+    private void printKeys(Map<String, Integer> map) {
+        // Create "empty" arraylist
+        ArrayList<String> strings = new ArrayList<>();
+
+        for (int i = 0 ; i < map.size(); i++) {
+            strings.add("");
+        }
+
+        // Add each item to its index
+        for (String s : map.keySet()) {
+            System.out.println("adding " + s + " to index " + map.get(s));
+            strings.set(map.get(s), s);
+        }
+
+        // Print list
+        int strSize = strings.size();
+        for (int i = 0; i < strSize; i++) {
+            System.out.println(i + ". " + strings.get(i));
         }
     }
 }
