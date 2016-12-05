@@ -36,5 +36,12 @@
             <artifactId>json</artifactId>
             <version>20160810</version>
         </dependency>
+
+        <!--SMILE library-->
+        <dependency>
+            <groupId>com.github.haifengl</groupId>
+            <artifactId>smile-core</artifactId>
+            <version>1.1.0</version>
+        </dependency>
     </dependencies>
 </project>
