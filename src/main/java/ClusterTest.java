@@ -20,6 +20,7 @@ public class ClusterTest {
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvPath))) {
             String line;
+            int[] textIds;
 
             // Skip headers (this var. should be used later to select which comparison to make clusters with)
             String headers = br.readLine();
@@ -30,7 +31,7 @@ public class ClusterTest {
 
                 if (fields.length > 2) {
                     // Array to keep the text IDs
-                    int[] textIds = new int[2];
+                    textIds = new int[2];
 
                     // Get the ID of each text title (pro tip: they are 2)
                     for (int i = 0; i < 2; i++) {
