@@ -1,4 +1,5 @@
 import org.javatuples.Triplet;
+import smile.clustering.GMeans;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,7 +9,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class ClusterTest {
-    private final static String csvPath = "MUC3_python/temp.csv";
+//    private final static String csvPath = "MUC3_python/temp.csv";
+    private final static String csvPath = "out.csv";
 
     public static void main(String[] args) {
         ClusterTest ct = new ClusterTest();
@@ -80,18 +82,20 @@ public class ClusterTest {
                 data[id2][id1] = value;
             }
 
-            // Make each text be completely the same with itself (make 0.0 -> 1.0)
+            // Make each text be completely the same with itself because it is but array is initialized with zeroes
             for (int i = 0; i < data.length; i++) {
                 data[i][i] = 1.0;
             }
 
             // Print data array
-            for (double[] aData : data) {
-                for (int j = 0; j < data.length; j++) {
-                    System.out.print(aData[j] + "\t");
-                }
-                System.out.println();
-            }
+//            for (double[] aData : data) {
+//                for (int j = 0; j < data.length; j++) {
+//                    System.out.print(aData[j] + "\t");
+//                }
+//                System.out.println();
+//            }
+
+            GMeans gMeans = new GMeans(data, 100);
         } catch (Exception e) {
             System.err.println(e.toString());
         }
