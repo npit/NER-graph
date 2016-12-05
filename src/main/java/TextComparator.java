@@ -12,13 +12,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 
-public class NamedEntityGraph {
+public class TextComparator {
     private final static boolean cacheGraphs = true;
 
     private final Logger LOGGER = Logger.getLogger("NamedEntityGraph");
 
     public static void main(String[] args) {
-        NamedEntityGraph neg = new NamedEntityGraph();
+        TextComparator neg = new TextComparator();
 
         try {
             neg.start();
