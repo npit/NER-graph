@@ -52,7 +52,7 @@ public class ClusterTest {
                 }
             }
         } catch (Exception e) {
-            System.err.println(e);
+            System.err.println(e.toString());
         }
     }
 }
