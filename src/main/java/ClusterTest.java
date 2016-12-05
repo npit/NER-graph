@@ -17,8 +17,6 @@ public class ClusterTest {
     }
 
     private void start() {
-        System.out.println("clustering test!");
-
         // Hashmap to save the ID for each text
         Map<String, Integer> textMap = new HashMap<>();
 
@@ -33,6 +31,8 @@ public class ClusterTest {
             String[] headers = br.readLine().split(",");
 //            int colToCluster = askForColumnID(headers);
             int colToCluster = 13;
+
+            System.out.println("Using column with name: " + headers[colToCluster]);
 
             while ((line = br.readLine()) != null) {
                 // Process the line
@@ -67,12 +67,30 @@ public class ClusterTest {
             }
 
             // Create the data array
-            int compLen = comparisons.size();
-            double[][] data = new double[compLen - 1][compLen - 1];
+            double[][] data = new double[textMap.size()][textMap.size()];
 
-            System.out.println("length " + compLen);
             for (Triplet<Integer, Integer, Double> t : comparisons) {
-//                System.out.println(t);
+                // Get data from triplet
+                int id1 = t.getValue0();
+                int id2 = t.getValue1();
+                double value = t.getValue2();
+
+                // Add data from triplet to the array for clustering
+                data[id1][id2] = value;
+                data[id2][id1] = value;
+            }
+
+            // Make each text be completely the same with itself (make 0.0 -> 1.0)
+            for (int i = 0; i < data.length; i++) {
+                data[i][i] = 1.0;
+            }
+
+            // Print data array
+            for (double[] aData : data) {
+                for (int j = 0; j < data.length; j++) {
+                    System.out.print(aData[j] + "\t");
+                }
+                System.out.println();
             }
         } catch (Exception e) {
             System.err.println(e.toString());
