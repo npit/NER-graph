@@ -95,7 +95,16 @@ public class ClusterTest {
 //                System.out.println();
 //            }
 
-            GMeans gMeans = new GMeans(data, 100);
+            GMeans clusters = new GMeans(data, 100);
+            System.out.println("Clusters number: " + clusters.getNumClusters());
+            int[] labels = clusters.getClusterLabel();
+            int[] sizes = clusters.getClusterSize();
+
+            // se poio cluster einai to kathe text
+            System.out.println("Labels " + labels.length);
+
+            // ta megethi tou kathe dataset
+            System.out.println("Sizes " + sizes.length);
         } catch (Exception e) {
             System.err.println(e.toString());
         }
