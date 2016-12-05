@@ -1,3 +1,5 @@
+import org.javatuples.Triplet;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -24,13 +26,16 @@ public class ClusterTest {
             String line;
             int[] textIds;
 
-            // Skip headers (this var. should be used later to select which comparison to make clusters with)
+            // Create tuple arraylist to hold the comparison data to create data array later
+            ArrayList<Triplet<Integer, Integer, Double>> comparisons = new ArrayList<>();
+
+            // Get headers and ask the user which column he would like to use for clustering
             String[] headers = br.readLine().split(",");
 //            int colToCluster = askForColumnID(headers);
             int colToCluster = 13;
 
             while ((line = br.readLine()) != null) {
-                // process the line.
+                // Process the line
                 String[] fields = line.split(",");
 
                 if (fields.length > 2) {
@@ -51,15 +56,24 @@ public class ClusterTest {
                         textIds[i] = textMap.get(textTitle);
                     }
 
-                    // TODO: Here we have the IDs of the texts, get the appropriate value from the column
+                    // Get the similarity of the two texts from the column
                     double similarityValue = Double.valueOf(fields[colToCluster]);
+
+                    // Add a new triplet with the data to the arraylist
+                    comparisons.add(new Triplet<>(textIds[0], textIds[1], similarityValue));
                 } else {
                     System.err.println("Error... Not even 3 fields in CSV?");
                 }
             }
 
-            // Print the list of texts and their IDs
-            printKeys(textMap);
+            // Create the data array
+            int compLen = comparisons.size();
+            double[][] data = new double[compLen - 1][compLen - 1];
+
+            System.out.println("length " + compLen);
+            for (Triplet<Integer, Integer, Double> t : comparisons) {
+//                System.out.println(t);
+            }
         } catch (Exception e) {
             System.err.println(e.toString());
         }

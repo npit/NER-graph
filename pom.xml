@@ -43,5 +43,13 @@
             <artifactId>smile-core</artifactId>
             <version>1.1.0</version>
         </dependency>
+
+        <!--Java Tuples library-->
+        <dependency>
+            <groupId>org.javatuples</groupId>
+            <artifactId>javatuples</artifactId>
+            <version>1.2</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>
