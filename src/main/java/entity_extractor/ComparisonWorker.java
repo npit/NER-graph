@@ -93,7 +93,7 @@ public class ComparisonWorker implements Runnable {
      */
     private void compareTexts(String title1, String title2) {
         // Create comparator and graph similarity objects
-        NGramCachedGraphComparator comparator = new NGramCachedGraphComparator();
+        NGramCachedGraphComparator comparator = new NGramCachedGraphComparator();   //todo: is this correct to use this for word graphs? and to reuse it?
         GraphSimilarity sim;
         ArrayList<ComparisonResult> results = new ArrayList<>();
 
