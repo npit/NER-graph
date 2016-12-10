@@ -73,7 +73,7 @@ public class TextComparator {
                             // Log the progress so far
                             currPercent = Percentage.percent(i, totalFiles);
                             Level lvl = Level.FINE;
-                            if (currPercent - percentage > 1.0) {
+                            if (currPercent - percentage > 1.0 || i == totalFiles) {
                                 lvl = Level.INFO;
                                 percentage = currPercent;
                             }
