@@ -37,8 +37,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//import gr.demokritos.iit.gr.demokritos.iit.crisprngganalysis.structs.Sequence;
-
 /**
  *
  * @author ggianna
