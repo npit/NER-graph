@@ -23,45 +23,33 @@
 package clustering;
 
 import Jama.Matrix;
-//import gr.demokritos.iit.gr.demokritos.iit.crisprngganalysis.structs.Sequence;
-import gr.demokritos.iit.jinsect.algorithms.clustering.IClusterer;
+import entity_extractor.TextEntities;
 import gr.demokritos.iit.jinsect.documentModel.comparators.NGramCachedGraphComparator;
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
-import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramSymWinGraph;
-import gr.demokritos.iit.jinsect.events.SimilarityComparatorListener;
-import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+//import gr.demokritos.iit.gr.demokritos.iit.crisprngganalysis.structs.Sequence;
+
 /**
  *
  * @author ggianna
  */
 //extends BaseSimCalculator
-@SuppressWarnings("unused")
-public class MarkovClusterer implements IClusterer {
+@SuppressWarnings({"unused", "SpellCheckingInspection"})
+public class MarkovClusterer {
     //    Map<Cluster, List<Sequence>> hsSequencesPerCluster = new HashMap<>();
-    Map<Sequence, Cluster> hsClusterPerSequence = new HashMap<>();
-    List<Sequence> origSequences;
+    Map<TextEntities, Cluster> hsClusterPerSequence = new HashMap<>();
+    List<TextEntities> origSequences;
 
-    MatrixVisualizer mv = new MatrixVisualizer();
-
-    public MarkovClusterer(List<Sequence> lsSequences) {
+    public MarkovClusterer(List<TextEntities> lsSequences) {
         origSequences = new ArrayList<>(lsSequences);
     }
 
@@ -72,7 +60,7 @@ public class MarkovClusterer implements IClusterer {
         // For every cluster
         for (Cluster cCur : lClusters) {
             // For every sequence in cluster
-            for (Sequence aCur : cCur) {
+            for (TextEntities aCur : cCur) {
                 // Update map of sequence -> cluster (name)
                 hsClusterPerSequence.put(aCur, cCur);
             }
@@ -113,7 +101,7 @@ public class MarkovClusterer implements IClusterer {
         // Final step: Interprete results
         // For each row (cluster)
         for (int iRow = 0; iRow < mLastRes.getRowDimension(); iRow++) {
-            HashSet<Sequence> hsCur = new HashSet<>(); // Impose uniqueness
+            HashSet<TextEntities> hsCur = new HashSet<>(); // Impose uniqueness
 
             // For all columns (seqs)
             for (int iCol = 0; iCol < mLastRes.getColumnDimension(); iCol++) {
@@ -163,8 +151,6 @@ public class MarkovClusterer implements IClusterer {
             mSims = mLastRes.copy();
 
             // DEBUG LINES
-            mv.updateSims(mSims);
-            mv.show();
 //            try {
 //                br.readLine();
 //            } catch (IOException ex) {
@@ -176,7 +162,6 @@ public class MarkovClusterer implements IClusterer {
         }
 
         Thread.sleep(1000); // Wait a second, to keep last img
-        mv.hide();
         return mLastRes;
     }
 
@@ -187,19 +172,19 @@ public class MarkovClusterer implements IClusterer {
      * @param lAllSequences
      * @return
      */
-    protected Matrix getSimilarityMatrix(List<Sequence> lAllSequences) {
+    protected Matrix getSimilarityMatrix(List<TextEntities> lAllSequences) {
         // Init sim matrix
         final Matrix mSims = new Matrix(lAllSequences.size(), lAllSequences.size());
         // Perform parallel execution
         ExecutorService es = Executors.newFixedThreadPool(
                 Runtime.getRuntime().availableProcessors());
         // Init final vars
-        final List<Sequence> lAllSequencesArg = lAllSequences;
+        final List<TextEntities> lAllSequencesArg = lAllSequences;
         int iFirstCnt = 0;
 
         // For every sentence pair in cluster
         final Random r = new Random();
-        for (final Sequence aFirst : lAllSequences) {
+        for (final TextEntities aFirst : lAllSequences) {
             final int iFirstCntArg = iFirstCnt;
             es.submit(new Runnable() {
 
@@ -213,7 +198,7 @@ public class MarkovClusterer implements IClusterer {
                     DocumentNGramGraph gFirst =
                             CSVToFeatures.getGraphFromSequence(aFirst);
 
-                    for (Sequence aSecond : lAllSequencesArg) {
+                    for (TextEntities aSecond : lAllSequencesArg) {
                         if (iSecondCnt == iFirstCntArg) {
                             dSim = 0.0; // IMPORTANT: Self-similarity is zero
 //                            dSim = 1.0; // IMPORTANT: Self-similarity is one
@@ -308,14 +293,14 @@ public class MarkovClusterer implements IClusterer {
 
                     // For every item in first
                     boolean bFoundMatch = false;
-                    for (Sequence s : cFirst) {
+                    for (TextEntities s : cFirst) {
                         if (cSecond.contains(s)) {
                             bFoundMatch = true;
                             break;
                         }
                     }
                     if (bFoundMatch) {
-                        Set<Sequence> sAll = new HashSet<>();
+                        Set<TextEntities> sAll = new HashSet<>();
                         // Collapse both to the first
                         keepUniqueSeqs(sAll, cFirst, cSecond);
                         // Mark second to be removed
@@ -331,24 +316,14 @@ public class MarkovClusterer implements IClusterer {
         }
     }
 
-    protected void keepUniqueSeqs(Set<Sequence> sAll, Cluster cFirst, Cluster cSecond) {
+    protected void keepUniqueSeqs(Set<TextEntities> sAll, Cluster cFirst, Cluster cSecond) {
         sAll.addAll(cFirst);
         sAll.addAll(cSecond);
         cFirst.clear();
         cFirst.addAll(sAll);
     }
 
-    public void setSequences(List<Sequence> lsSequences) {
+    public void setSequences(List<TextEntities> lsSequences) {
         origSequences = new ArrayList<>(lsSequences);
-    }
-
-    @Override
-    public void calculateClusters(Set set, SimilarityComparatorListener similarityComparatorListener) {
-
-    }
-
-    @Override
-    public UniqueVertexGraph getHierarchy() {
-        return null;
     }
 }

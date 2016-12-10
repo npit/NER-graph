@@ -1,5 +1,7 @@
 package clustering;
 
+import entity_extractor.TextEntities;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -7,7 +9,7 @@ import java.util.UUID;
  *
  * @author ggianna
  */
-public class Cluster extends ArrayList<Sequence> implements Comparable<Cluster> {
+public class Cluster extends ArrayList<TextEntities> implements Comparable<Cluster> {
     String sID;
     public Cluster() {
         sID = UUID.randomUUID().toString();
