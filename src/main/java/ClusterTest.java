@@ -100,7 +100,7 @@ public class ClusterTest {
             int[] labels = clusters.getClusterLabel();
             int[] sizes = clusters.getClusterSize();
 
-            // se poio cluster einai to kathe text
+            // se poio cluster einai to kathe text (?????)
             System.out.println("Labels " + labels.length);
 
             // ta megethi tou kathe dataset
@@ -119,7 +119,6 @@ public class ClusterTest {
         }
 
         // Ask for ID
-
         while(id > columns.length - 1 || id == 0 || id == 1) {
             System.out.print("Enter number of column to cluster: ");
             id = new Scanner(System.in).nextInt();
