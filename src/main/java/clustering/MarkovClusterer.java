@@ -25,7 +25,8 @@ package clustering;
 import Jama.Matrix;
 import entity_extractor.TextEntities;
 import gr.demokritos.iit.jinsect.documentModel.comparators.NGramCachedGraphComparator;
-import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
+import gr.demokritos.iit.jinsect.documentModel.representations.DocumentWordGraph;
+import gr.demokritos.iit.jinsect.structs.GraphSimilarity;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -195,8 +196,9 @@ public class MarkovClusterer {
 
                     NGramCachedGraphComparator ngc = new NGramCachedGraphComparator();
                     // Create first graph
-                    DocumentNGramGraph gFirst =
-                            CSVToFeatures.getGraphFromSequence(aFirst);
+                    DocumentWordGraph gFirst = new DocumentWordGraph();
+                    gFirst.setDataString(aFirst.getEntityTextWithPlaceholderSameSize("A")); // HERE we change method
+//                            CSVToFeatures.getGraphFromSequence(aFirst);
 
                     for (TextEntities aSecond : lAllSequencesArg) {
                         if (iSecondCnt == iFirstCntArg) {
@@ -233,6 +235,19 @@ public class MarkovClusterer {
         // TODO: Use cache?
 
         return mSims;
+    }
+
+    private double graphToSequenceSimilarity(DocumentWordGraph gFirst, TextEntities aSecond) {
+        // Create graph for 2nd text
+        DocumentWordGraph gSecond = new DocumentWordGraph();
+        gSecond.setDataString(aSecond.getEntityTextWithPlaceholderSameSize("A"));   // HERE we change method
+
+        // Create comparator and compare the 2 graphs
+        NGramCachedGraphComparator comparator = new NGramCachedGraphComparator();
+        GraphSimilarity gSim = comparator.getSimilarityBetween(gFirst, gSecond);
+
+        // Return NVS
+        return (gSim.SizeSimilarity == 0) ? 0.0 : (gSim.ValueSimilarity / gSim.SizeSimilarity);
     }
 
     /**
