@@ -1,5 +1,6 @@
 import os
 import csv
+import string
 from html.parser import HTMLParser
 
 
@@ -20,6 +21,29 @@ class MUC3Parser(HTMLParser):
                 category = content[0][1]
 
                 self.data = category
+
+
+class MUC3TextExtractor(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.data = ""
+        self.isBody = False
+
+    def error(self, message):
+        pass
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "body":
+            self.isBody = True
+
+    def handle_endtag(self, tag):
+        if tag == "body":
+            self.isBody = False
+
+    # noinspection PyUnresolvedReferences
+    def handle_data(self, data):
+        if self.isBody:
+            self.data += data
 
 
 def get_text_type(path, file):
@@ -78,10 +102,50 @@ def main():
                     # If text categories are the same, write a 1, otherwise 0
                     new_row = row
 
+                    # Get each text as a string
+                    with open("../texts/input/" + text1, 'r') as f:
+                        text1str = f.read().replace('\n', '')
+
+                    with open("../texts/input/" + text2, 'r') as f:
+                        text2str = f.read().replace('\n', '')
+
+                    # Keep only text from HTML (MUC3 is html format)
+                    parser = MUC3TextExtractor()
+                    parser.feed(text1str)
+                    text1data = parser.data
+
+                    parser = MUC3TextExtractor()
+                    parser.feed(text2str)
+                    text2data = parser.data
+
+                    # Remove punctuation
+                    table = str.maketrans("", "")
+                    for c in string.punctuation:
+                        text1data = text1data.replace(c, " ")
+                        text2data = text2data.replace(c, " ")
+
+                    # Split texts into arrays
+                    text1array = text1data.split(" ")
+                    text2array = text2data.split(" ")
+
+                    # Remove empty strings
+                    text1array = [x.strip() for x in text1array if x.strip()]
+                    text2array = [x.strip() for x in text2array if x.strip()]
+
+                    # Find ratio (idea: http://stackoverflow.com/a/29929179)
+                    common_items = set(text1array) & set(text2array)
+                    all_items = set(text1array) | set(text2array)
+
+                    common_to_all = len(common_items) / float(len(all_items))
+
+                    # Add similarity depending mainly on the DC.coverage from
+                    # the MUC3 dataset, but also the word overlap
                     if text_categories[text1] == text_categories[text2]:
-                        new_row.append(1)
+                        # Categories are the same, minimum 0.5 similarity
+                        new_row.append(0.5 + (common_to_all / 2.0))
                     else:
-                        new_row.append(0)
+                        # Categories different, maximum 0.5 similarity
+                        new_row.append(0 + (common_to_all / 2.0))
 
                     # Write this row to the new csv
                     writer.writerow(new_row)
