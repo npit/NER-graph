@@ -52,6 +52,19 @@ public class MarkovClusterer {
         origSequences = new ArrayList<>(lsSequences);
     }
 
+    /**
+     * Returns a graph from a TextEntities object. Is used a few times in the algorithm, so to change the method
+     * used for clustering change it in this method
+     * @param te    Text to get graph for
+     * @return      Graph from text
+     */
+    public static DocumentWordGraph getGraphFromTextEntities(TextEntities te) {
+        DocumentWordGraph g = new DocumentWordGraph();
+        g.setDataString(te.getEntityTextWithPlaceholderSameSize("A"));
+
+        return g;
+    }
+
     public List<Cluster> calculateClusters() {
         // Get clusters of sequences
         List<Cluster> lClusters = getSequenceClusters();
@@ -194,8 +207,7 @@ public class MarkovClusterer {
 
                     NGramCachedGraphComparator ngc = new NGramCachedGraphComparator();
                     // Create first graph
-                    DocumentWordGraph gFirst = new DocumentWordGraph();
-                    gFirst.setDataString(aFirst.getEntityTextWithPlaceholderSameSize("A")); // HERE we change method
+                    DocumentWordGraph gFirst = MarkovClusterer.getGraphFromTextEntities(aFirst);
 //                            CSVToFeatures.getGraphFromSequence(aFirst);
 
                     for (TextEntities aSecond : lAllSequencesArg) {
@@ -237,8 +249,7 @@ public class MarkovClusterer {
 
     private double graphToSequenceSimilarity(DocumentWordGraph gFirst, TextEntities aSecond) {
         // Create graph for 2nd text
-        DocumentWordGraph gSecond = new DocumentWordGraph();
-        gSecond.setDataString(aSecond.getEntityTextWithPlaceholderSameSize("A"));   // HERE we change method
+        DocumentWordGraph gSecond = MarkovClusterer.getGraphFromTextEntities(aSecond);
 
         // Create comparator and compare the 2 graphs
         NGramCachedGraphComparator comparator = new NGramCachedGraphComparator();
