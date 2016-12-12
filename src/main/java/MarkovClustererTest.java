@@ -1,3 +1,4 @@
+import clustering.Cluster;
 import clustering.MarkovClusterer;
 import entity_extractor.EntityExtractor;
 import entity_extractor.OpenCalaisExtractor;
@@ -9,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.*;
 
 /**
@@ -96,8 +98,13 @@ public class MarkovClustererTest {
         LOGGER.log(Level.INFO, "Starting the markov clustering");
         MarkovClusterer mc = new MarkovClusterer(texts);
 
-        mc.calculateClusters();
+        List<Cluster> clusters = mc.calculateClusters();
 
+        LOGGER.log(Level.INFO, "Number of clusters: " + clusters.size());
+
+        for (Cluster c : clusters) {
+            LOGGER.log(Level.INFO, c.getID() + " => " + c.size() + " texts");
+        }
     }
 
 }
