@@ -80,6 +80,8 @@ def main():
     # Get the "category" of each text from the DC.coverage attribute of MUC3
     text_categories = get_text_categories(path)
 
+    print("Successfully gotten categories, starting GOLD calculation...")
+
     # Check that the CSV to read exists
     if os.path.isfile(csv_path):
         with open(csv_path) as f:
@@ -91,6 +93,8 @@ def main():
                 # Add headers to the new csv file
                 headers = next(reader)
                 headers.append("GOLD")
+                headers.append("text1 wcount")
+                headers.append("text2 wcount")
                 writer.writerow(headers)
 
                 # Read data rows
@@ -118,8 +122,14 @@ def main():
                     parser.feed(text2str)
                     text2data = parser.data
 
+                    # Remove text titles from the texts
+                    text1_filename_without_ext = row[0].split(".")[0]
+                    text2_filename_without_ext = row[1].split(".")[0]
+                    text1data = text1data.replace(text1_filename_without_ext,
+                                                  "")
+                    text2data = text2data.replace(text2_filename_without_ext,
+                                                  "")
                     # Remove punctuation
-                    table = str.maketrans("", "")
                     for c in string.punctuation:
                         text1data = text1data.replace(c, " ")
                         text2data = text2data.replace(c, " ")
@@ -147,8 +157,13 @@ def main():
                         # Categories different, maximum 0.5 similarity
                         new_row.append(0 + (common_to_all / 2.0))
 
+                    # Add text word counts
+                    new_row.append(len(text1array))
+                    new_row.append(len(text2array))
+
                     # Write this row to the new csv
                     writer.writerow(new_row)
+    print("Done!")
 
 
 if __name__ == '__main__':
