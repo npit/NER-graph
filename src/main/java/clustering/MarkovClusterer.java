@@ -267,7 +267,6 @@ public class MarkovClusterer {
      * @return The normalized matrix.
      */
     protected Matrix normalizeMatrixPerColumn(Matrix mToNormalize, double dPower) {
-
         // For every column
         for (int iColumnCnt = 0; iColumnCnt < mToNormalize.getColumnDimension(); iColumnCnt++) {
             // Determine sum
@@ -289,7 +288,6 @@ public class MarkovClusterer {
                 // Update matrix value to normalized value
                 mToNormalize.set(iRowCnt, iColumnCnt, dNormalized);
             }
-
         }
 
         return mToNormalize;
