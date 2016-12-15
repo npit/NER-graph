@@ -39,3 +39,6 @@ texts/
 
 # exported csv
 *.csv
+
+#ignore 7z that i use for compression of CSVs
+*.7z
