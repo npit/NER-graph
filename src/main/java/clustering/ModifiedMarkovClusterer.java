@@ -22,6 +22,7 @@ public class ModifiedMarkovClusterer extends MarkovClusterer {
      * @param dPower The power to raise the elements to, before normalization
      * @return The normalized matrix.
      */
+    @SuppressWarnings("Duplicates")
     protected Matrix normalizeMatrixPerColumn(Matrix mToNormalize, double dPower) {
         // For every column
         for (int iColumnCnt = 0; iColumnCnt < mToNormalize.getColumnDimension(); iColumnCnt++) {

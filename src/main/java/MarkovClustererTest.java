@@ -1,5 +1,5 @@
 import clustering.Cluster;
-import clustering.MarkovClusterer;
+import clustering.TestableMarkovClusterer;
 import entity_extractor.EntityExtractor;
 import entity_extractor.OpenCalaisExtractor;
 import entity_extractor.TextEntities;
@@ -96,15 +96,59 @@ public class MarkovClustererTest {
         }
 
         LOGGER.log(Level.INFO, "Starting the markov clustering");
-        MarkovClusterer mc = new MarkovClusterer(texts);
+//        MarkovClusterer mc = new MarkovClusterer(texts);
+        TestableMarkovClusterer tmc;
 
-        List<Cluster> clusters = mc.calculateClusters();
+        // Test multiple inflation factors
+        double[] factors = new double[]{1.4, 2.0, 3.0, 4.0, 6.0};
+        for (int i = 0; i < factors.length; i++) {
+            double factor = factors[i];
+            LOGGER.log(Level.INFO, "Markov Clustering with inflaction factor: " + factor);
+            tmc = new TestableMarkovClusterer(texts, false, 5, factor);
 
-        LOGGER.log(Level.INFO, "Number of clusters: " + clusters.size());
+            List<Cluster> clusters = tmc.calculateClusters();
 
-        for (Cluster c : clusters) {
-            LOGGER.log(Level.INFO, c.getID() + " => " + c.size() + " texts");
+            LOGGER.log(Level.INFO, "Number of clusters: " + clusters.size());
+
+            for (Cluster c : clusters) {
+                LOGGER.log(Level.INFO, c.getID() + " => " + c.size() + " texts");
+            }
         }
+
+        // Test multiple num of iterations
+//        for (int i = 0; i < 10; i++) {
+//            LOGGER.log(Level.INFO, "Markov Clustering with MODIFIED NORMALIZATION and: " + (i + 1) + " num of iterations");
+//            tmc = new TestableMarkovClusterer(texts, true, i + 1, 3.0);
+//
+//            List<Cluster> clusters = tmc.calculateClusters();
+//
+//            LOGGER.log(Level.INFO, "Number of clusters: " + clusters.size());
+//
+//            for (Cluster c : clusters) {
+//                LOGGER.log(Level.INFO, c.getID() + " => " + c.size() + " texts");
+//            }
+//        }
+//        for (int i = 0; i < 10; i++) {
+//            LOGGER.log(Level.INFO, "Markov Clustering with ORIGINAL NORMALIZATION and: " + (i + 1) + " num of iterations");
+//            tmc = new TestableMarkovClusterer(texts, false, i + 1, 3.0);
+//
+//            List<Cluster> clusters = tmc.calculateClusters();
+//
+//            LOGGER.log(Level.INFO, "Number of clusters: " + clusters.size());
+//
+//            for (Cluster c : clusters) {
+//                LOGGER.log(Level.INFO, c.getID() + " => " + c.size() + " texts");
+//            }
+//        }
+//        ModifiedMarkovClusterer mc = new ModifiedMarkovClusterer(texts);
+
+//        List<Cluster> clusters = mc.calculateClusters();
+//
+//        LOGGER.log(Level.INFO, "Number of clusters: " + clusters.size());
+//
+//        for (Cluster c : clusters) {
+//            LOGGER.log(Level.INFO, c.getID() + " => " + c.size() + " texts");
+//        }
     }
 
 }
