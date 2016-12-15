@@ -95,6 +95,7 @@ def main():
                 headers.append("GOLD")
                 headers.append("text1 wcount")
                 headers.append("text2 wcount")
+                headers.append("word difference")
                 writer.writerow(headers)
 
                 # Read data rows
@@ -160,6 +161,12 @@ def main():
                     # Add text word counts
                     new_row.append(len(text1array))
                     new_row.append(len(text2array))
+
+                    # Add word difference
+                    diff = len(text1array) - len(text2array)
+                    if diff < 0:
+                        diff *= -1
+                    new_row.append(diff)
 
                     # Write this row to the new csv
                     writer.writerow(new_row)
