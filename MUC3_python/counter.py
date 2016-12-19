@@ -23,7 +23,6 @@ class MUC3Parser(HTMLParser):
 
 
 def get_text_type(path, file):
-    print("called with: " + file)
     # Open the file
     with open(path + file, "r") as f:
         content = f.read()
@@ -61,11 +60,16 @@ class MUC3TextExtractor(HTMLParser):
 def main():
     temp_file = "temp-25.csv"
     texts_path = "../texts/input-25/"
+    print_individual_texts = False
 
     same = 0
     different = 0
     coverages = {}
     counted_texts = []
+    word_diffs = {
+        "same": [],
+        "diff": []
+    }
 
     with open(temp_file, "r", newline="") as f:
         # Read the CSV
@@ -74,6 +78,7 @@ def main():
         # Get headers from file and find the index of the gold column
         headers = next(reader)
         gold_index = headers.index("GOLD")
+        w_diff_index = headers.index("word difference")
 
         # Read data rows
         for row in reader:
@@ -125,24 +130,31 @@ def main():
 
             common_to_all = len(common_items) / float(len(all_items))
 
-            print(new_row[0] + " (" + str(len(text1array)) + " words)" + " vs "
-                  + new_row[1] + " (" + str(len(text2array)) + " words)")
+            if print_individual_texts:
+                print(new_row[0] + " (" + str(len(text1array)) + " words)" +
+                      " vs " + new_row[1] + " (" + str(len(text2array)) +
+                      " words)")
 
             # Add similarity depending mainly on the DC.coverage from
             # the MUC3 dataset, but also the word overlap
             if float(new_row[gold_index]) > 0.5:
                 same += 1
-                print("DC.coverage: same")
+                word_diffs["same"].append(int(row[w_diff_index]))
+                if print_individual_texts:
+                    print("DC.coverage: same")
             else:
                 different += 1
-                print("DC.coverage: different")
+                word_diffs["diff"].append(int(row[w_diff_index]))
+                if print_individual_texts:
+                    print("DC.coverage: different")
 
-            print("Common words\t(" + str(len(common_items)) + "): " +
-                  ', '.join([str(x) for x in sorted(common_items)]))
-            print("All words\t\t(" + str(len(all_items)) + "): " +
-                  ', '.join([str(x) for x in sorted(all_items)]))
-            print("Ratio: " + str(common_to_all * 100) + "%")
-            print()
+            if print_individual_texts:
+                print("Common words\t(" + str(len(common_items)) + "): " +
+                      ', '.join([str(x) for x in sorted(common_items)]))
+                print("All words\t\t(" + str(len(all_items)) + "): " +
+                      ', '.join([str(x) for x in sorted(all_items)]))
+                print("Ratio: " + str(common_to_all * 100) + "%")
+                print()
 
             # Get text types of texts to count them
             for i in range(0, 2):
@@ -152,6 +164,7 @@ def main():
                 else:
                     counted_texts.append(row[i])
 
+                # Get text type
                 text_type = get_text_type(texts_path, row[i])
 
                 # Check which length
@@ -162,7 +175,6 @@ def main():
 
                 # Add to existing array or create new
                 if text_type in coverages:
-                    print(text_type + " exists: " + str(coverages[text_type]))
                     coverages[text_type].append(length)
                 else:
                     coverages[text_type] = []
@@ -171,6 +183,11 @@ def main():
             # return
         print("Same categories:\t\t" + str(same))
         print("Different categories:\t" + str(different))
+
+        print("Word diffs (same): " + str(word_diffs["same"]))
+        print("\tavg: " + str(sum(word_diffs["same"])/len(word_diffs["same"])))
+        print("Word diffs (diff): " + str(word_diffs["diff"]))
+        print("\tavg: " + str(sum(word_diffs["diff"])/len(word_diffs["diff"])))
 
         # Print how many texts in each dc.coverage type, and their word counts
         for text_type in coverages:
