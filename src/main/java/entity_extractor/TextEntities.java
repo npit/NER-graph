@@ -108,7 +108,6 @@ public class TextEntities {
         StringTokenizer st = new StringTokenizer(this.text, wordSeparator);
         ArrayList<String> words = new ArrayList<>(numOfWords);
 
-
         int tokenIndex = 0;
         while(st.hasMoreTokens()) {
             words.add(tokenIndex++, st.nextToken());
