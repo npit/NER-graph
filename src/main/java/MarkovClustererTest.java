@@ -1,4 +1,5 @@
 import clustering.Cluster;
+import clustering.ModifiedMarkovClusterer;
 import clustering.TestableMarkovClusterer;
 import entity_extractor.EntityExtractor;
 import entity_extractor.OpenCalaisExtractor;
@@ -141,7 +142,7 @@ public class MarkovClustererTest {
 //            }
 //        }
 //        ModifiedMarkovClusterer mc = new ModifiedMarkovClusterer(texts);
-
+//
 //        List<Cluster> clusters = mc.calculateClusters();
 //
 //        LOGGER.log(Level.INFO, "Number of clusters: " + clusters.size());

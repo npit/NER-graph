@@ -108,10 +108,10 @@ def main():
                     new_row = row
 
                     # Get each text as a string
-                    with open("../texts/input/" + text1, 'r') as f:
+                    with open(path + text1, 'r') as f:
                         text1str = f.read().replace('\n', '')
 
-                    with open("../texts/input/" + text2, 'r') as f:
+                    with open(path + text2, 'r') as f:
                         text2str = f.read().replace('\n', '')
 
                     # Keep only text from HTML (MUC3 is html format)
