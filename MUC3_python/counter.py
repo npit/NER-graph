@@ -58,8 +58,8 @@ class MUC3TextExtractor(HTMLParser):
 
 
 def main():
-    temp_file = "temp-25.csv"
-    texts_path = "../texts/input-25/"
+    temp_file = "temp-500.csv"
+    texts_path = "../texts/input-500/"
     print_individual_texts = False
 
     same = 0
@@ -67,6 +67,10 @@ def main():
     coverages = {}
     counted_texts = []
     word_diffs = {
+        "same": [],
+        "diff": []
+    }
+    ratios = {
         "same": [],
         "diff": []
     }
@@ -140,11 +144,13 @@ def main():
             if float(new_row[gold_index]) > 0.5:
                 same += 1
                 word_diffs["same"].append(int(row[w_diff_index]))
+                ratios["same"].append(common_to_all)
                 if print_individual_texts:
                     print("DC.coverage: same")
             else:
                 different += 1
                 word_diffs["diff"].append(int(row[w_diff_index]))
+                ratios["diff"].append(common_to_all)
                 if print_individual_texts:
                     print("DC.coverage: different")
 
@@ -183,11 +189,17 @@ def main():
             # return
         print("Same categories:\t\t" + str(same))
         print("Different categories:\t" + str(different))
-
-        print("Word diffs (same): " + str(word_diffs["same"]))
+        print()
+        print("Word count diffs (same): " + str(word_diffs["same"]))
         print("\tavg: " + str(sum(word_diffs["same"])/len(word_diffs["same"])))
-        print("Word diffs (diff): " + str(word_diffs["diff"]))
+        print("Word count diffs (diff): " + str(word_diffs["diff"]))
         print("\tavg: " + str(sum(word_diffs["diff"])/len(word_diffs["diff"])))
+        print()
+        print("Ratios (same): " + str(ratios["same"]))
+        print("\tavg: " + str(sum(ratios["same"])/len(ratios["same"])))
+        print("Ratios (diff): " + str(ratios["diff"]))
+        print("\tavg: " + str(sum(ratios["diff"])/len(ratios["diff"])))
+        print()
 
         # Print how many texts in each dc.coverage type, and their word counts
         for text_type in coverages:
