@@ -59,8 +59,8 @@ class MUC3TextExtractor(HTMLParser):
 
 
 def main():
-    temp_file = "temp-10.csv"
-    texts_path = "../texts/input-10/"
+    temp_file = "temp-25.csv"
+    texts_path = "../texts/input-25/"
 
     same = 0
     different = 0
@@ -71,9 +71,9 @@ def main():
         # Read the CSV
         reader = csv.reader(f, delimiter=",", quoting=csv.QUOTE_NONE)
 
-        # Add headers to the new csv file
+        # Get headers from file and find the index of the gold column
         headers = next(reader)
-        headers.append("GOLD")
+        gold_index = headers.index("GOLD")
 
         # Read data rows
         for row in reader:
@@ -130,7 +130,7 @@ def main():
 
             # Add similarity depending mainly on the DC.coverage from
             # the MUC3 dataset, but also the word overlap
-            if float(new_row[-3]) > 0.5:
+            if float(new_row[gold_index]) > 0.5:
                 same += 1
                 print("DC.coverage: same")
             else:
