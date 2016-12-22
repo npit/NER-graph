@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class ClusterTest {
-//    private final static String csvPath = "MUC3_python/temp.csv";
-    private final static String csvPath = "out.csv";
+    private final static String csvPath = "MUC3_python/temp-500.csv";
+//    private final static String csvPath = "out.csv";
 
     public static void main(String[] args) {
         ClusterTest ct = new ClusterTest();
@@ -83,9 +83,9 @@ public class ClusterTest {
             }
 
             // Make each text be completely the same with itself because it is but array is initialized with zeroes
-            for (int i = 0; i < data.length; i++) {
-                data[i][i] = 1.0;
-            }
+//            for (int i = 0; i < data.length; i++) {
+//                data[i][i] = 1.0;
+//            }
 
             // Print data array
 //            for (double[] aData : data) {
