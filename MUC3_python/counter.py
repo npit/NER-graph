@@ -1,25 +1,6 @@
 import csv
 import string
-from html.parser import HTMLParser
-
-
-# noinspection PyAttributeOutsideInit
-class MUC3Parser(HTMLParser):
-    def error(self, message):
-        pass
-
-    def handle_starttag(self, tag, attrs):
-        if tag == "meta":
-            result = [attr for attr in attrs if
-                      (attr[0] == "name" and attr[1] == "DC.coverage")]
-            if len(result) > 0:
-                # This is the DC.coverage <meta> tag, get the category
-                content = [attr for attr in attrs if (attr[0] == "content")]
-
-                # Category is in the (1) result, the 2nd element of the tuple
-                category = content[0][1]
-
-                self.data = category
+import MUC3Utils
 
 
 def get_text_type(path, file):
@@ -28,38 +9,15 @@ def get_text_type(path, file):
         content = f.read()
 
         # Create HTML parser to get the dc.content type
-        parser = MUC3Parser()
+        parser = MUC3Utils.CategoryExtractor()
         parser.feed(content)
 
         return parser.data
 
 
-class MUC3TextExtractor(HTMLParser):
-    def __init__(self):
-        super().__init__()
-        self.data = ""
-        self.isBody = False
-
-    def error(self, message):
-        pass
-
-    def handle_starttag(self, tag, attrs):
-        if tag == "body":
-            self.isBody = True
-
-    def handle_endtag(self, tag):
-        if tag == "body":
-            self.isBody = False
-
-    # noinspection PyUnresolvedReferences
-    def handle_data(self, data):
-        if self.isBody:
-            self.data += data
-
-
 def main():
-    temp_file = "temp-500.csv"
-    texts_path = "../texts/input-500/"
+    temp_file = "temp-25.csv"
+    texts_path = "../texts/input-25/"
     print_individual_texts = False
 
     same = 0
@@ -101,11 +59,11 @@ def main():
                 text2str = f.read().replace('\n', '')
 
             # Keep only text from HTML (MUC3 is html format)
-            parser = MUC3TextExtractor()
+            parser = MUC3Utils.TextExtractor()
             parser.feed(text1str)
             text1data = parser.data
 
-            parser = MUC3TextExtractor()
+            parser = MUC3Utils.TextExtractor()
             parser.feed(text2str)
             text2data = parser.data
 
@@ -202,6 +160,7 @@ def main():
         print()
 
         # Print how many texts in each dc.coverage type, and their word counts
+        print("Number of different DC.coverage values: " + str(len(coverages)))
         for text_type in coverages:
             print(text_type + " (" + str(len(coverages[text_type])) +
                   " texts) -> " + str(coverages[text_type]))
