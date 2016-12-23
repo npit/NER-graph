@@ -16,8 +16,8 @@ def get_text_type(path, file):
 
 
 def main():
-    temp_file = "temp-100.csv"
-    texts_path = "../texts/input/"
+    temp_file = "temp-500.csv"
+    texts_path = "../texts/input-500/"
     print_individual_texts = False
 
     same = 0
@@ -44,8 +44,8 @@ def main():
         headers = next(reader)
         gold_index = headers.index("GOLD")
         w_diff_index = headers.index("word difference")
-        # elki_index = headers.index("PHSS (A) NVS")
-        elki_index = headers.index("GOLD")
+        elki_index = headers.index("PHSS (A) NVS")
+        # elki_index = headers.index("GOLD")
 
         # Read data rows
         for row in reader:
@@ -108,8 +108,8 @@ def main():
             common_to_all = len(common_items) / float(len(all_items))
 
             if print_individual_texts:
-                print(new_row[0] + " (" + str(len(text1array)) + " words)" +
-                      " vs " + new_row[1] + " (" + str(len(text2array)) +
+                print(text1 + " (" + str(len(text1array)) + " words)" +
+                      " vs " + text2 + " (" + str(len(text2array)) +
                       " words)")
 
             # Add similarity depending mainly on the DC.coverage from
