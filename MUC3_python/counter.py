@@ -16,8 +16,8 @@ def get_text_type(path, file):
 
 
 def main():
-    temp_file = "temp-25.csv"
-    texts_path = "../texts/input-25/"
+    temp_file = "temp-100.csv"
+    texts_path = "../texts/input/"
     print_individual_texts = False
 
     same = 0
@@ -33,6 +33,9 @@ def main():
         "diff": []
     }
 
+    text_ids = {}
+    elki_array = []
+
     with open(temp_file, "r", newline="") as f:
         # Read the CSV
         reader = csv.reader(f, delimiter=",", quoting=csv.QUOTE_NONE)
@@ -41,12 +44,24 @@ def main():
         headers = next(reader)
         gold_index = headers.index("GOLD")
         w_diff_index = headers.index("word difference")
+        # elki_index = headers.index("PHSS (A) NVS")
+        elki_index = headers.index("GOLD")
 
         # Read data rows
         for row in reader:
             # Get text titles
             text1 = row[0]
             text2 = row[1]
+
+            # Get values for elki
+            if text1 not in text_ids:
+                text_ids[text1] = len(text_ids)
+            if text2 not in text_ids:
+                text_ids[text2] = len(text_ids)
+
+            elki_array.append(str(text_ids[text1]) + " " +
+                              str(text_ids[text2]) + " " +
+                              row[elki_index] + "\n")
 
             # If text categories are the same, write a 1, otherwise 0
             new_row = row
@@ -68,8 +83,8 @@ def main():
             text2data = parser.data
 
             # Remove text titles from the texts
-            text1_filename_without_ext = row[0].split(".")[0]
-            text2_filename_without_ext = row[1].split(".")[0]
+            text1_filename_without_ext = text1.split(".")[0]
+            text2_filename_without_ext = text2.split(".")[0]
             text1data = text1data.replace(text1_filename_without_ext, "")
             text2data = text2data.replace(text2_filename_without_ext, "")
 
@@ -164,6 +179,14 @@ def main():
         for text_type in coverages:
             print(text_type + " (" + str(len(coverages[text_type])) +
                   " texts) -> " + str(coverages[text_type]))
+
+        # Write file for elki distance matrix
+        with open("elki_distance_matrix.txt", "w") as elki_f:
+            elki_f.writelines(elki_array)
+
+        with open("elki_text_ids.txt", "w") as elki_f:
+            for text in text_ids:
+                elki_f.write(text + " " + str(text_ids[text]) + "\n")
 
 
 if __name__ == '__main__':

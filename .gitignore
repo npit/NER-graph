@@ -42,3 +42,7 @@ texts/
 
 #ignore 7z that i use for compression of CSVs
 *.7z
+
+#ignore output files of python script for elki
+MUC3_python/elki_distance_matrix.txt
+MUC3_python/elki_text_ids.txt
