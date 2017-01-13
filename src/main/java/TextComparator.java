@@ -12,6 +12,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 
+/**
+ * Main program.
+ * Reads a folder of text files, gets entities for each using the specified entity extractor, the compares all texts
+ * with all other texts with all the available methods, and outputs the results to a CSV file (and a log file)
+ */
 public class TextComparator {
     private final static boolean cacheGraphs = true;
 

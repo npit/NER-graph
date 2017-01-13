@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+/**
+ * Clustering tests with SMILE library
+ */
 public class ClusterTest {
     private final static String csvPath = "MUC3_python/temp-500.csv";
 //    private final static String csvPath = "out.csv";

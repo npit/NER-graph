@@ -1,6 +1,3 @@
-import clustering.Cluster;
-import clustering.ModifiedMarkovClusterer;
-import clustering.TestableMarkovClusterer;
 import entity_extractor.EntityExtractor;
 import entity_extractor.OpenCalaisExtractor;
 import entity_extractor.TextEntities;
@@ -11,21 +8,20 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.logging.*;
 
 /**
- * Clustering tests with Markov Clustering implementation by ggianna
+ * Creates a matrix which shows for each pair of texts how many common entities they have
  */
-@SuppressWarnings("SpellCheckingInspection")
-public class MarkovClustererTest {
+@SuppressWarnings("Duplicates")
+public class CommonEntitiesMatrixCreator {
     private final Logger LOGGER = Logger.getLogger("MarkovClusterer");
 
     public static void main(String[] args) {
-        MarkovClustererTest mct = new MarkovClustererTest();
+        CommonEntitiesMatrixCreator cemc = new CommonEntitiesMatrixCreator();
 
         try {
-            mct.start();
+            cemc.start();
         } catch(IOException e) {
             System.err.println("Problem writing log file");
         }
@@ -42,13 +38,13 @@ public class MarkovClustererTest {
         consoleHandler.setFormatter(new VerySimpleFormatter());
         LOGGER.addHandler(consoleHandler);
 
-        Handler fileHandler = new FileHandler("./neg_markov.log");
+        Handler fileHandler = new FileHandler("./neg_matrix.log");
         fileHandler.setLevel(Level.FINEST);
         fileHandler.setFormatter(new VerySimpleFormatter());
         LOGGER.addHandler(fileHandler);
 
         // Main variables
-        String inputFolder = "texts/input";
+        String inputFolder = "texts/input-25";
 
         File input = new File(inputFolder);
         EntityExtractor entityExtractor = new OpenCalaisExtractor();
@@ -96,60 +92,6 @@ public class MarkovClustererTest {
             return;
         }
 
-        LOGGER.log(Level.INFO, "Starting the markov clustering");
-//        MarkovClusterer mc = new MarkovClusterer(texts);
-        TestableMarkovClusterer tmc;
-
-        // Test multiple inflation factors
-        double[] factors = new double[]{1.4, 2.0, 3.0, 4.0, 6.0};
-        for (int i = 0; i < factors.length; i++) {
-            double factor = factors[i];
-            LOGGER.log(Level.INFO, "Markov Clustering with inflaction factor: " + factor);
-            tmc = new TestableMarkovClusterer(texts, false, 5, factor);
-
-            List<Cluster> clusters = tmc.calculateClusters();
-
-            LOGGER.log(Level.INFO, "Number of clusters: " + clusters.size());
-
-            for (Cluster c : clusters) {
-                LOGGER.log(Level.INFO, c.getID() + " => " + c.size() + " texts");
-            }
-        }
-
-        // Test multiple num of iterations
-//        for (int i = 0; i < 10; i++) {
-//            LOGGER.log(Level.INFO, "Markov Clustering with MODIFIED NORMALIZATION and: " + (i + 1) + " num of iterations");
-//            tmc = new TestableMarkovClusterer(texts, true, i + 1, 3.0);
-//
-//            List<Cluster> clusters = tmc.calculateClusters();
-//
-//            LOGGER.log(Level.INFO, "Number of clusters: " + clusters.size());
-//
-//            for (Cluster c : clusters) {
-//                LOGGER.log(Level.INFO, c.getID() + " => " + c.size() + " texts");
-//            }
-//        }
-//        for (int i = 0; i < 10; i++) {
-//            LOGGER.log(Level.INFO, "Markov Clustering with ORIGINAL NORMALIZATION and: " + (i + 1) + " num of iterations");
-//            tmc = new TestableMarkovClusterer(texts, false, i + 1, 3.0);
-//
-//            List<Cluster> clusters = tmc.calculateClusters();
-//
-//            LOGGER.log(Level.INFO, "Number of clusters: " + clusters.size());
-//
-//            for (Cluster c : clusters) {
-//                LOGGER.log(Level.INFO, c.getID() + " => " + c.size() + " texts");
-//            }
-//        }
-//        ModifiedMarkovClusterer mc = new ModifiedMarkovClusterer(texts);
-//
-//        List<Cluster> clusters = mc.calculateClusters();
-//
-//        LOGGER.log(Level.INFO, "Number of clusters: " + clusters.size());
-//
-//        for (Cluster c : clusters) {
-//            LOGGER.log(Level.INFO, c.getID() + " => " + c.size() + " texts");
-//        }
+        //todo: make matrix
     }
-
 }
