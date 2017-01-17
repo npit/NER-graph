@@ -20,7 +20,7 @@
  * 
  */
 
-package clustering;
+package clustering.markov;
 
 import Jama.Matrix;
 import entity_extractor.TextEntities;

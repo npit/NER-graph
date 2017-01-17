@@ -1,3 +1,5 @@
+package clustering;
+
 import org.javatuples.Triplet;
 import smile.clustering.GMeans;
 
@@ -11,12 +13,12 @@ import java.util.Scanner;
 /**
  * Clustering tests with SMILE library
  */
-public class ClusterTest {
+public class SMILEClusteringTest {
     private final static String csvPath = "MUC3_python/temp-500.csv";
 //    private final static String csvPath = "out.csv";
 
     public static void main(String[] args) {
-        ClusterTest ct = new ClusterTest();
+        SMILEClusteringTest ct = new SMILEClusteringTest();
 
         ct.start();
     }

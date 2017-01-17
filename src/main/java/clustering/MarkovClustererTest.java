@@ -1,6 +1,7 @@
-import clustering.Cluster;
-import clustering.ModifiedMarkovClusterer;
-import clustering.TestableMarkovClusterer;
+package clustering;
+
+import clustering.markov.Cluster;
+import clustering.markov.TestableMarkovClusterer;
 import entity_extractor.EntityExtractor;
 import entity_extractor.OpenCalaisExtractor;
 import entity_extractor.TextEntities;
