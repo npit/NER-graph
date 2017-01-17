@@ -4,7 +4,7 @@ package clustering.accuracy_measures;
  * Create dummy cluster data to test accuracy measures with before implementing the actual class that will read
  * the clusters from ELKI's output files
  */
-public class DummyData {
+public class DummyData implements ClustersData {
     private Clusters clusters;
     private Clusters groundTruth;
 
@@ -65,11 +65,13 @@ public class DummyData {
         clusters.addCluster(tempCluster);
     }
 
-    public Clusters getClusters() {
+    @Override
+    public Clusters getAlgorithmClusters() {
         return clusters;
     }
 
-    public Clusters getGroundTruth() {
+    @Override
+    public Clusters getGroundTruthClusters() {
         return groundTruth;
     }
 }
