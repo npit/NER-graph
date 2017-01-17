@@ -8,6 +8,7 @@ import utils.VerySimpleFormatter;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.*;
@@ -46,7 +47,8 @@ public class CommonEntitiesMatrixCreator {
         LOGGER.addHandler(fileHandler);
 
         // Main variables
-        String inputFolder = "texts/input-500";
+        String inputFolder = "texts/input-25";
+        String csvOutput = "common-entities-matrix-25.csv";
 
         File input = new File(inputFolder);
         EntityExtractor entityExtractor = new OpenCalaisExtractor();
@@ -148,6 +150,26 @@ public class CommonEntitiesMatrixCreator {
             System.out.println();
         }
 
-        //todo: export to CSV?
+        // Export matrix to CSV file
+        try {
+            PrintWriter writer = new PrintWriter(csvOutput, "UTF-8");
+
+            for (int i = 0; i < numOfTexts; i++) {
+                for (int j = 0; j < numOfTexts; j++) {
+                    writer.print(mtrx.get(i, j));
+
+                    // Add comma except for the end of the line
+                    if (j < numOfTexts - 1) {
+                        writer.print(",");
+                    }
+                }
+
+                writer.println();
+            }
+
+            writer.close();
+        } catch(IOException e) {
+            System.err.println("Couldn't write file :( " + e.getMessage());
+        }
     }
 }
