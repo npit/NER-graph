@@ -100,12 +100,18 @@ public class CommonEntitiesMatrixCreator {
         // For all text combinations add common entities % to the matrix
         for (int i = 0; i < numOfTexts; i++) {
             for (int j = 0; j < i + 1; j++) {
-//                System.out.println("i: " + i + " j:" + j);
                 if (i == j) {
                     // If i equals j it is the same text with itself, so they have all the same entities
                     mtrx.set(i, j, 1.0);
                 } else {
-                    //todo: check how many common entities here
+                    // Check how many common entities the texts have, and how many they have in total
+                    TextEntities text1 = texts.get(i);
+                    TextEntities text2 = texts.get(j);
+
+                    int totalEntities = text1.getEntities().size() + text2.getEntities().size();
+                    System.out.println(i + "x" + j + " -> " + totalEntities);
+
+                    //todo: find common entities and divide them :D
                 }
             }
         }
