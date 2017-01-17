@@ -46,7 +46,7 @@ public class CommonEntitiesMatrixCreator {
         LOGGER.addHandler(fileHandler);
 
         // Main variables
-        String inputFolder = "texts/input-10";
+        String inputFolder = "texts/input-500";
 
         File input = new File(inputFolder);
         EntityExtractor entityExtractor = new OpenCalaisExtractor();
@@ -109,6 +109,7 @@ public class CommonEntitiesMatrixCreator {
                     TextEntities text1 = texts.get(i);
                     TextEntities text2 = texts.get(j);
 
+                    // Get total entities (todo: maybe should be UNIQUE entities?)
                     int totalEntities = text1.getEntities().size() + text2.getEntities().size();
 
                     // Assuming that same "name" attribute == same entity, find the common ones
@@ -138,6 +139,15 @@ public class CommonEntitiesMatrixCreator {
             }
         }
 
-        //todo: print matrix or export to CSV?
+        // Print matrix
+        for (int i = 0; i < numOfTexts; i++) {
+            for (int j = 0; j < numOfTexts; j++) {
+                System.out.print(String.format("%1$,.3f", mtrx.get(i, j)) + "\t");
+            }
+
+            System.out.println();
+        }
+
+        //todo: export to CSV?
     }
 }
