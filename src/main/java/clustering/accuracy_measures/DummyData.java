@@ -1,7 +1,75 @@
 package clustering.accuracy_measures;
 
 /**
- * Created by Leo on 2017-01-17.
+ * Create dummy cluster data to test accuracy measures with before implementing the actual class that will read
+ * the clusters from ELKI's output files
  */
 public class DummyData {
+    private Clusters clusters;
+    private Clusters groundTruth;
+
+    public DummyData() {
+        // Create dummy data
+        clusters = new Clusters();
+        groundTruth = new Clusters();
+
+        SimpleCluster tempCluster;
+
+        // Assuming we will have 10 texts, the ground truth is that they should be 3 clusters which contain text indexes:
+        // cluster #0: 2, 4, 5
+        // cluster #1: 1, 3, 7, 8
+        // cluster #2: 0, 6, 9
+
+        // Ground truth cluster #0
+        tempCluster = new SimpleCluster();
+        tempCluster.addText(2);
+        tempCluster.addText(4);
+        tempCluster.addText(5);
+        groundTruth.addCluster(tempCluster);
+
+        // Ground truth cluster #1
+        tempCluster = new SimpleCluster();
+        tempCluster.addText(1);
+        tempCluster.addText(3);
+        tempCluster.addText(7);
+        tempCluster.addText(8);
+        groundTruth.addCluster(tempCluster);
+
+        // Ground truth cluster #2
+        tempCluster = new SimpleCluster();
+        tempCluster.addText(0);
+        tempCluster.addText(6);
+        tempCluster.addText(9);
+        groundTruth.addCluster(tempCluster);
+
+        // Create non-existent algorithm's clusters
+        // cluster #0: 2, 4, 6, 9
+        // cluster #1: 0, 1, 3, 5, 7, 8
+
+        // Fake algorithm cluster #0
+        tempCluster = new SimpleCluster();
+        tempCluster.addText(2);
+        tempCluster.addText(4);
+        tempCluster.addText(6);
+        tempCluster.addText(9);
+        clusters.addCluster(tempCluster);
+
+        // Fake algorithm cluster #1
+        tempCluster = new SimpleCluster();
+        tempCluster.addText(0);
+        tempCluster.addText(1);
+        tempCluster.addText(3);
+        tempCluster.addText(5);
+        tempCluster.addText(7);
+        tempCluster.addText(8);
+        clusters.addCluster(tempCluster);
+    }
+
+    public Clusters getClusters() {
+        return clusters;
+    }
+
+    public Clusters getGroundTruth() {
+        return groundTruth;
+    }
 }
