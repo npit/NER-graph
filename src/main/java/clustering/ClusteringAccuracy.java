@@ -18,5 +18,8 @@ public class ClusteringAccuracy {
         DummyData data = new DummyData();
         Clusters g = data.getGroundTruthClusters();
         Clusters a = data.getAlgorithmClusters();
+
+        System.out.println(g);
+        System.out.println(a);
     }
 }

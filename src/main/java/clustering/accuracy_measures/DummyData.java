@@ -74,4 +74,14 @@ public class DummyData implements ClustersData {
     public Clusters getGroundTruthClusters() {
         return groundTruth;
     }
+
+    @Override
+    public int numOfGroundTruthClusters() {
+        return groundTruth.getClustersNum();
+    }
+
+    @Override
+    public int numOfAlgorithmClusters() {
+        return clusters.getClustersNum();
+    }
 }

@@ -7,4 +7,8 @@ public interface ClustersData {
     Clusters getAlgorithmClusters();
 
     Clusters getGroundTruthClusters();
+
+    int numOfGroundTruthClusters();
+
+    int numOfAlgorithmClusters();
 }

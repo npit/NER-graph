@@ -27,4 +27,9 @@ public class Clusters {
     public ArrayList<SimpleCluster> getClusters() {
         return clusters;
     }
+
+    @Override
+    public String toString() {
+        return clusters.toString();
+    }
 }
