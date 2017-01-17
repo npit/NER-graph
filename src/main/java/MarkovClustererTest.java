@@ -31,6 +31,7 @@ public class MarkovClustererTest {
         }
     }
 
+    @SuppressWarnings("Duplicates")
     private void start() throws IOException {
         // Setup logger
         LOGGER.setLevel(Level.FINEST);

@@ -1,5 +1,6 @@
 import Jama.Matrix;
 import entity_extractor.EntityExtractor;
+import entity_extractor.ExtractedEntity;
 import entity_extractor.OpenCalaisExtractor;
 import entity_extractor.TextEntities;
 import utils.Percentage;
@@ -109,11 +110,34 @@ public class CommonEntitiesMatrixCreator {
                     TextEntities text2 = texts.get(j);
 
                     int totalEntities = text1.getEntities().size() + text2.getEntities().size();
-                    System.out.println(i + "x" + j + " -> " + totalEntities);
 
-                    //todo: find common entities and divide them :D
+                    // Assuming that same "name" attribute == same entity, find the common ones
+                    int commonEntities = 0;
+
+                    // For each entity of text1, check if there is one in the other text with the same name
+                    for (ExtractedEntity text1Entity : text1.getEntities()) {
+                        for (ExtractedEntity text2Entity : text2.getEntities()) {
+                            if (text1Entity.getName().equals(text2Entity.getName())) {
+                                // Count entity as existing in both texts
+                                commonEntities++;
+
+                                // Since the text1Entity exists in the 2nd text, we don't need to look at text 2's other
+                                // entities
+                                break;
+                            }
+                        }
+                    }
+
+                    double result = ((double)commonEntities) / totalEntities;
+//                    System.out.println(i + "x" + j + " -> " + commonEntities + "/" + totalEntities + " ===> " + result);
+
+                    // Set the result on the 2 positions of the matrix (symmetric matrix)
+                    mtrx.set(i, j, result);
+                    mtrx.set(j, i, result);
                 }
             }
         }
+
+        //todo: print matrix or export to CSV?
     }
 }
