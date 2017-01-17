@@ -1,3 +1,4 @@
+import Jama.Matrix;
 import entity_extractor.EntityExtractor;
 import entity_extractor.OpenCalaisExtractor;
 import entity_extractor.TextEntities;
@@ -44,7 +45,7 @@ public class CommonEntitiesMatrixCreator {
         LOGGER.addHandler(fileHandler);
 
         // Main variables
-        String inputFolder = "texts/input-25";
+        String inputFolder = "texts/input-10";
 
         File input = new File(inputFolder);
         EntityExtractor entityExtractor = new OpenCalaisExtractor();
@@ -92,6 +93,21 @@ public class CommonEntitiesMatrixCreator {
             return;
         }
 
-        //todo: make matrix
+        // Get number of texts and create matrix for storing results in
+        int numOfTexts = texts.size();
+        Matrix mtrx = new Matrix(numOfTexts, numOfTexts);
+
+        // For all text combinations add common entities % to the matrix
+        for (int i = 0; i < numOfTexts; i++) {
+            for (int j = 0; j < i + 1; j++) {
+//                System.out.println("i: " + i + " j:" + j);
+                if (i == j) {
+                    // If i equals j it is the same text with itself, so they have all the same entities
+                    mtrx.set(i, j, 1.0);
+                } else {
+                    //todo: check how many common entities here
+                }
+            }
+        }
     }
 }
