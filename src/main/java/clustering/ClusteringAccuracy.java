@@ -22,6 +22,7 @@ public class ClusteringAccuracy {
         DummyData data = new DummyData();
         Clusters gClusters = data.getGroundTruthClusters();
         Clusters aClusters = data.getAlgorithmClusters();
+        int textsNum = data.numOfTexts();
 
         // Find mapping (f) of ground truth clusters -> algorithm's clusters
         // (for each cluster in 'G' find the one in the 'C' which has the highest percentage of common elements)
@@ -42,10 +43,21 @@ public class ClusteringAccuracy {
                 }
             }
 
-            System.out.println("f(" + g + ") = " + f.get(g) + " --> " + highestPercent + " similarity");
+            System.out.println("f(" + g + ") = " + f.get(g) + " --> " + String.format("%1$,.2f", highestPercent * 100 ) + " % of common items");
         }
 
-        // todo: Calculate Pr (weighted avg. of PRi's over all ground truth clusters)
+        // Calculate Pr (weighted avg. of PRi's over all ground truth clusters)
+        //todo: confirm that R is the set with the clustered texts, so that |R| from the paper is indeed textsNum
+        double precision = 0;
+
+        for (SimpleCluster g : gClusters.getClusters()) {
+            double weight = ((double)g.getTexts().size()) / textsNum;
+
+            precision += weight * g.precision(f.get(g));
+        }
+
+        System.out.println("Total precision (Pr): " + precision);
+
 
         // todo: Calculate Re (weighted avg. of Rei's over all ground truth clusters)
 
