@@ -59,7 +59,16 @@ public class ClusteringAccuracy {
         System.out.println("Total precision (Pr): " + precision);
 
 
-        // todo: Calculate Re (weighted avg. of Rei's over all ground truth clusters)
+        // Calculate Re (weighted avg. of Rei's over all ground truth clusters)
+        double recall = 0;
+
+        for (SimpleCluster g : gClusters.getClusters()) {
+            double weight = ((double)g.getTexts().size()) / textsNum;
+
+            recall += weight * g.recall(f.get(g));
+        }
+
+        System.out.println("Total recall (Re): " + recall);
 
         // todo: Calculate CPr (avg of CPRi's)
 
