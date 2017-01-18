@@ -7,7 +7,6 @@ import clustering.accuracy_measures.SimpleCluster;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Uses a class for getting ground truth clusters and clusters created by an algorithm, and measures their accuracy
