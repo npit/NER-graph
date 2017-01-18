@@ -11,4 +11,6 @@ public interface ClustersData {
     int numOfGroundTruthClusters();
 
     int numOfAlgorithmClusters();
+
+    int numOfTexts();
 }

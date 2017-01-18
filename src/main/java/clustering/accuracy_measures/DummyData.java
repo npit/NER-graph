@@ -7,6 +7,7 @@ package clustering.accuracy_measures;
 public class DummyData implements ClustersData {
     private Clusters clusters;
     private Clusters groundTruth;
+    private final int textsNum = 10;
 
     public DummyData() {
         // Create dummy data
@@ -83,5 +84,10 @@ public class DummyData implements ClustersData {
     @Override
     public int numOfAlgorithmClusters() {
         return clusters.getClustersNum();
+    }
+
+    @Override
+    public int numOfTexts() {
+        return textsNum;
     }
 }
