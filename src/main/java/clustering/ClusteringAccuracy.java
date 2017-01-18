@@ -70,6 +70,11 @@ public class ClusteringAccuracy {
 
         System.out.println("Total recall (Re): " + recall);
 
+        // Calculate F1 (harmonic mean of precision and recall)
+        double f1 = (2 * precision * recall) / (precision + recall);
+
+        System.out.println("F1-measure: " + f1);
+
         // todo: Calculate CPr (avg of CPRi's)
 
         // todo: Calculate PCPr
