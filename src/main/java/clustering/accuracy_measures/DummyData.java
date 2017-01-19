@@ -5,9 +5,9 @@ package clustering.accuracy_measures;
  * the clusters from ELKI's output files
  */
 public class DummyData implements ClustersData {
-    private Clusters clusters;
-    private Clusters groundTruth;
-    private final int textsNum = 10;
+    Clusters clusters;
+    Clusters groundTruth;
+    int textsNum = 10;
 
     public DummyData() {
         // Create dummy data
