@@ -2,6 +2,7 @@ package clustering;
 
 import clustering.accuracy_measures.Clusters;
 import clustering.accuracy_measures.DummyData;
+import clustering.accuracy_measures.DummyData2;
 import clustering.accuracy_measures.SimpleCluster;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class ClusteringAccuracy {
     }
 
     private void start() {
-        DummyData data = new DummyData();
+        DummyData data = new DummyData2();
         Clusters gClusters = data.getGroundTruthClusters();
         Clusters aClusters = data.getAlgorithmClusters();
         int textsNum = data.numOfTexts();
@@ -99,13 +100,19 @@ public class ClusteringAccuracy {
             System.err.println("Error with clustering precision: no clusters with size > 1?");
         }
 
-        // todo: Calculate PCPr
-        //noinspection StatementWithEmptyBody
-        if (gClusters.getClustersNum() > aClusters.getClustersNum()) {
-            // k/k' * CPr
+        // Calculate PCPr (penalised clustering precision)
+        double multiplier;
+        if (gClusters.getClustersNum() < aClusters.getClustersNum()) {
+            // Will do k/k' * CPr
+            multiplier = ((double)gClusters.getClustersNum()) / aClusters.getClustersNum();
         } else {
-            // k'/k * CPr
+            // Will do k'/k * CPr
+            multiplier = ((double)aClusters.getClustersNum()) / gClusters.getClustersNum();
         }
+
+        double pcpr = multiplier * clusteringPrecision;
+
+        System.out.println("Penalised Clustering Precision: " + pcpr);
     }
 
     /**
