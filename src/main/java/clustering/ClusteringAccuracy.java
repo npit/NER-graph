@@ -75,7 +75,29 @@ public class ClusteringAccuracy {
 
         System.out.println("F1-measure: " + f1);
 
-        // todo: Calculate CPr (avg of CPRi's)
+        // Calculate CPr (avg of CPRi's)
+        double clusteringPrecision = 0;
+        int divider = 0;
+
+        for (SimpleCluster g : gClusters.getClusters()) {
+            SimpleCluster c = f.get(g);
+
+            // Skip clusters of size 1
+            if (c.getTexts().size() > 1) {
+                double cpri = c.clusteringPrecision(g, aClusters.getClustersNum());
+
+                clusteringPrecision += cpri;
+                divider++;
+            }
+        }
+
+        if (divider > 0) {
+            clusteringPrecision = clusteringPrecision / divider;
+
+            System.out.println("Clustering precision: " + clusteringPrecision);
+        } else {
+            System.err.println("Error with clustering precision: no clusters with size > 1?");
+        }
 
         // todo: Calculate PCPr
         //noinspection StatementWithEmptyBody

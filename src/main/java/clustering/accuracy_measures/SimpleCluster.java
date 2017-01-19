@@ -1,5 +1,7 @@
 package clustering.accuracy_measures;
 
+import utils.Binomial;
+
 import java.util.ArrayList;
 
 /**
@@ -70,5 +72,23 @@ public class SimpleCluster {
         int thisItems = this.getTexts().size();
 
         return ((double)commonItems) / thisItems;
+    }
+
+    /**
+     * Calculate the precision with which this cluster (assuming it is created by an algorithm) reproduces the given
+     * ground truth cluster ("g")
+     * @param g             Ground truth cluster that is mapped to this one
+     * @param clustersNum   Number of clusters that the algorithm output(ted)
+     * @return
+     */
+    public double clusteringPrecision(SimpleCluster g, int clustersNum) {
+        // Calculate number to divide by
+        long divider = Binomial.binomial(clustersNum, 2);
+
+        // Find number of items that are also in the ground truth cluster
+        int commonItems = intersection(this.getTexts(), g.getTexts()).size();
+
+        // Divide them
+        return ((double)commonItems) / divider;
     }
 }
