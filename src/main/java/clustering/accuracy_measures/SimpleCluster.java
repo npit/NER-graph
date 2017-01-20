@@ -86,9 +86,31 @@ public class SimpleCluster {
         long divider = Binomial.binomial(clustersNum, 2);
 
         // Find number of items that are also in the ground truth cluster
-        int commonItems = intersection(this.getTexts(), g.getTexts()).size();
+        int commonPairs = 0;
+
+        // For each pair of items in this cluster, check if it exists in "g" too
+        for (int i = 0; i < texts.size(); i++) {
+            for (int j = i + 1; j < texts.size(); j++) {
+                Integer t = texts.get(i);
+                Integer s = texts.get(j);
+
+//                System.out.print("t,s: " + t + " - " + s);
+
+                if (g.getTexts().contains(t) && g.getTexts().contains(s)) {
+                    commonPairs++;
+//                    System.out.println(" (exists in g too)");
+//                } else {
+//                    System.out.println(" (not in g...)");
+                }
+
+            }
+        }
+
+//        System.out.println("common pairs: " + commonPairs);
+//        System.out.println("divider: " + divider);
+//        System.out.println("cpri: " + ((double) commonPairs) / divider);
 
         // Divide them
-        return ((double)commonItems) / divider;
+        return ((double)commonPairs) / divider;
     }
 }
