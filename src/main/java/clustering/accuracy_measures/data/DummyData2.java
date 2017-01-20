@@ -1,4 +1,6 @@
-package clustering.accuracy_measures;
+package clustering.accuracy_measures.data;
+
+import clustering.accuracy_measures.SimpleCluster;
 
 /**
  * Like DummyData, but with more clusters and texts!

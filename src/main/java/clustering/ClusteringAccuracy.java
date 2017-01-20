@@ -1,9 +1,10 @@
 package clustering;
 
 import clustering.accuracy_measures.Clusters;
-import clustering.accuracy_measures.DummyData;
-import clustering.accuracy_measures.DummyData2;
+import clustering.accuracy_measures.data.DummyData;
+import clustering.accuracy_measures.data.DummyData2;
 import clustering.accuracy_measures.SimpleCluster;
+import clustering.accuracy_measures.data.DummyDataFullyAccurate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +21,7 @@ public class ClusteringAccuracy {
     }
 
     private void start() {
-        DummyData data = new DummyData2();
+        DummyData data = new DummyDataFullyAccurate();
         Clusters gClusters = data.getGroundTruthClusters();
         Clusters aClusters = data.getAlgorithmClusters();
         int textsNum = data.numOfTexts();

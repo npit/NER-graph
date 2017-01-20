@@ -1,4 +1,7 @@
-package clustering.accuracy_measures;
+package clustering.accuracy_measures.data;
+
+import clustering.accuracy_measures.Clusters;
+import clustering.accuracy_measures.SimpleCluster;
 
 /**
  * Create dummy cluster data to test accuracy measures with before implementing the actual class that will read
