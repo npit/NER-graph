@@ -10,13 +10,15 @@ import java.io.*;
  * program for calculating the clustering accuracy measures
  */
 public class ElkiOpticsXiData implements ClustersData {
-    Clusters algClusters;
-    Clusters groundTruth;
+    private Clusters algClusters;
+    private Clusters groundTruth;
+    private int textsNum;
 
     public ElkiOpticsXiData(String elkiClustersPath, String groundTruthFilePath) {
-        // Initialize arraylists
+        // Initialize variables
         algClusters = new Clusters();
         groundTruth = new Clusters();
+        textsNum = -1;
 
         // Get algorithm clusters from OPTICSXi ELKI output folder
         File[] files = new File(elkiClustersPath).listFiles();
@@ -51,9 +53,16 @@ public class ElkiOpticsXiData implements ClustersData {
                 SimpleCluster c = new SimpleCluster();
                 c.setName(coverageStr);
 
+                // Add each ID to the new cluster
                 for (String idStr : ids) {
                     Integer id = Integer.parseInt(idStr);
+
                     c.addText(id);
+
+                    // Keep the largest ID, because that will be the texts number later
+                    if (id + 1 > this.textsNum) {
+                        this.textsNum = id + 1;
+                    }
                 }
 
                 // Add the cluster to the other clusters
@@ -101,26 +110,26 @@ public class ElkiOpticsXiData implements ClustersData {
 
     @Override
     public Clusters getAlgorithmClusters() {
-        return null;
+        return algClusters;
     }
 
     @Override
     public Clusters getGroundTruthClusters() {
-        return null;
+        return groundTruth;
     }
 
     @Override
     public int numOfGroundTruthClusters() {
-        return 0;
+        return algClusters.getClustersNum();
     }
 
     @Override
     public int numOfAlgorithmClusters() {
-        return 0;
+        return groundTruth.getClustersNum();
     }
 
     @Override
     public int numOfTexts() {
-        return 0;
+        return textsNum;
     }
 }

@@ -1,10 +1,9 @@
 package clustering;
 
 import clustering.accuracy_measures.Clusters;
-import clustering.accuracy_measures.data.DummyData;
-import clustering.accuracy_measures.data.DummyData2;
 import clustering.accuracy_measures.SimpleCluster;
-import clustering.accuracy_measures.data.DummyDataFullyAccurate;
+import clustering.accuracy_measures.data.ClustersData;
+import clustering.accuracy_measures.data.ElkiOpticsXiData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +20,7 @@ public class ClusteringAccuracy {
     }
 
     private void start() {
-        DummyData data = new DummyDataFullyAccurate();
+        ClustersData data = new ElkiOpticsXiData("elkiout", "MUC3_python/ground_truth_clusters.txt");
         Clusters gClusters = data.getGroundTruthClusters();
         Clusters aClusters = data.getAlgorithmClusters();
         int textsNum = data.numOfTexts();
@@ -45,7 +44,7 @@ public class ClusteringAccuracy {
                 }
             }
 
-            System.out.println("f(" + g + ") = " + f.get(g) + " --> " + String.format("%1$,.2f", highestPercent * 100 ) + " % of common items");
+            System.out.println("f(" + g.getName() + ") = " + f.get(g).getName() + " --> " + String.format("%1$,.2f", highestPercent * 100 ) + " % of common items");
         }
 
         // Calculate Pr (weighted avg. of PRi's over all ground truth clusters)
