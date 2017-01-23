@@ -4,11 +4,9 @@ import utils.Binomial;
 
 import java.util.ArrayList;
 
-/**
- * Created by Leo on 2017-01-17.
- */
 public class SimpleCluster {
     private ArrayList<Integer> texts;
+    private String name;
 
     public SimpleCluster() {
         texts = new ArrayList<>();
@@ -26,9 +24,21 @@ public class SimpleCluster {
         return texts;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public String toString() {
-        return texts.toString();
+        if (name != null) {
+            return name + ": " + texts.toString();
+        } else {
+            return texts.toString();
+        }
     }
 
     /**
