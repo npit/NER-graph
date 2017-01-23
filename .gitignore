@@ -8,9 +8,6 @@ nbproject/*
 !nbproject/project.properties
 !nbproject/project.xml
 
-#java specific
-*.class
-
 #idea specific
 idea
 .idea/
@@ -46,3 +43,4 @@ texts/
 #ignore output files of python script for elki
 MUC3_python/elki_distance_matrix.txt
 MUC3_python/elki_text_ids.txt
+MUC3_python/ground_truth_clusters.txt

@@ -23,6 +23,7 @@ def main():
     same = 0
     different = 0
     coverages = {}
+    coverageIds = {}
     counted_texts = []
     word_diffs = {
         "same": [],
@@ -148,16 +149,21 @@ def main():
 
                 # Check which length
                 if i == 0:
+                    text_id = text_ids[text1]
                     length = len(text1array)
                 else:
+                    text_id = text_ids[text2]
                     length = len(text2array)
 
                 # Add to existing array or create new
                 if text_type in coverages:
                     coverages[text_type].append(length)
+                    coverageIds[text_type].append(text_id)
                 else:
                     coverages[text_type] = []
                     coverages[text_type].append(length)
+                    coverageIds[text_type] = []
+                    coverageIds[text_type].append(text_id)
 
             # return
         print("Same categories:\t\t" + str(same))
@@ -187,6 +193,13 @@ def main():
         with open("elki_text_ids.txt", "w") as elki_f:
             for text in text_ids:
                 elki_f.write(text + " " + str(text_ids[text]) + "\n")
+
+        # Write file for use in importing "ground truth" clusters to Java
+        # program
+        with open("ground_truth_clusters.txt", "w") as gt_f:
+            for coverage in coverageIds:
+                gt_f.write(coverage + "|" + str(" ".join(
+                    str(item) for item in coverageIds[coverage])) + "\n")
 
 
 if __name__ == '__main__':
