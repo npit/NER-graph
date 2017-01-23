@@ -23,7 +23,7 @@ def main():
     same = 0
     different = 0
     coverages = {}
-    coverageIds = {}
+    coverage_ids = {}
     counted_texts = []
     word_diffs = {
         "same": [],
@@ -158,12 +158,12 @@ def main():
                 # Add to existing array or create new
                 if text_type in coverages:
                     coverages[text_type].append(length)
-                    coverageIds[text_type].append(text_id)
+                    coverage_ids[text_type].append(text_id)
                 else:
                     coverages[text_type] = []
                     coverages[text_type].append(length)
-                    coverageIds[text_type] = []
-                    coverageIds[text_type].append(text_id)
+                    coverage_ids[text_type] = []
+                    coverage_ids[text_type].append(text_id)
 
             # return
         print("Same categories:\t\t" + str(same))
@@ -197,9 +197,9 @@ def main():
         # Write file for use in importing "ground truth" clusters to Java
         # program
         with open("ground_truth_clusters.txt", "w") as gt_f:
-            for coverage in coverageIds:
+            for coverage in coverage_ids:
                 gt_f.write(coverage + "|" + str(" ".join(
-                    str(item) for item in coverageIds[coverage])) + "\n")
+                    str(item) for item in coverage_ids[coverage])) + "\n")
 
 
 if __name__ == '__main__':
