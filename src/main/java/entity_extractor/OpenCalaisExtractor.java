@@ -135,6 +135,12 @@ public class OpenCalaisExtractor implements EntityExtractor {
         TextEntities entities = new TextEntities();
         JSONObject obj = new JSONObject(responseStr);
 
+        // Create blacklist with names of entities to ignore
+        ArrayList<String> blacklist = new ArrayList<>();
+        blacklist.add("DEV");
+        blacklist.add("http");
+        blacklist.add("html");
+
         // Get the document text from the response
         String text = obj.getJSONObject("doc").getJSONObject("info").getString("document");
         entities.setText(text);
@@ -159,7 +165,7 @@ public class OpenCalaisExtractor implements EntityExtractor {
             if (!typeGroup.equals("entities"))
                 continue;
 
-            // Skip tags that not for end user display
+            // Skip tags that are not for end user display
 //            if (tag.getString("forenduserdisplay").equals("false")) {
 //                continue;
 //            }
@@ -191,7 +197,10 @@ public class OpenCalaisExtractor implements EntityExtractor {
                 entity.setOffset(i.getInt("offset"));
                 entity.setLength(i.getInt("length"));
 
-                entities.addEntity(entity);
+                // Only add entity if its name is not blacklisted
+                if (!blacklist.contains(entity.getName())) {
+                    entities.addEntity(entity);
+                }
             }
         }
 
