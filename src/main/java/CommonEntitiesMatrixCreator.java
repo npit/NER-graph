@@ -48,8 +48,8 @@ public class CommonEntitiesMatrixCreator {
         LOGGER.addHandler(fileHandler);
 
         // Main variables
-        String inputFolder = "texts/input-25";
-        String csvOutput = "common-entities-matrix-25.csv";
+        String inputFolder = "texts/input-all";
+        String csvOutput = "common-entities-matrix-all.csv";
 
         File input = new File(inputFolder);
         EntityExtractor entityExtractor = new OpenCalaisExtractor();
@@ -79,7 +79,6 @@ public class CommonEntitiesMatrixCreator {
 
                             // Get entities for this file and save them
                             TextEntities entities = entityExtractor.getEntities(file);
-//                            entities.printEntities();
                             texts.add(entities);
 
                             LOGGER.log(Level.FINE, "[main] Got " + entities.getEntities().size() + " extracted entities from " + file + "\n");
@@ -154,13 +153,13 @@ public class CommonEntitiesMatrixCreator {
         System.out.println("Comparisons which had 0 common entities: " + zeroCommons);
 
         // Print matrix
-        for (int i = 0; i < numOfTexts; i++) {
-            for (int j = 0; j < numOfTexts; j++) {
-                System.out.print(String.format("%1$,.3f", mtrx.get(i, j)) + "\t");
-            }
-
-            System.out.println();
-        }
+//        for (int i = 0; i < numOfTexts; i++) {
+//            for (int j = 0; j < numOfTexts; j++) {
+//                System.out.print(String.format("%1$,.3f", mtrx.get(i, j)) + "\t");
+//            }
+//
+//            System.out.println();
+//        }
 
         // Export matrix to CSV file
         try {

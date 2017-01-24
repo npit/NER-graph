@@ -44,7 +44,7 @@ public class ClusteringAccuracy {
                 }
             }
 
-            System.out.println("f(" + g.getName() + ") = " + f.get(g).getName() + " --> " + String.format("%1$,.2f", highestPercent * 100 ) + " % of common items");
+            System.out.println("f(" + g.getName() + ") = " + f.get(g).getName() + " --> " + String.format("%1$,.4f", highestPercent * 100 ) + " % of common items");
         }
 
         // Calculate Pr (weighted avg. of PRi's over all ground truth clusters)
