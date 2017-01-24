@@ -48,7 +48,6 @@ public class ClusteringAccuracy {
         }
 
         // Calculate Pr (weighted avg. of PRi's over all ground truth clusters)
-        //todo: confirm that R is the set with the clustered texts, so that |R| from the paper is indeed textsNum
         double precision = 0;
 
         for (SimpleCluster g : gClusters.getClusters()) {
@@ -78,7 +77,7 @@ public class ClusteringAccuracy {
 
         // Calculate CPr (avg of CPRi's)
         double clusteringPrecision = 0;
-        int divider = 0;
+        int divider = aClusters.getClustersNum();
 
         for (SimpleCluster g : gClusters.getClusters()) {
             SimpleCluster c = f.get(g);
@@ -88,7 +87,6 @@ public class ClusteringAccuracy {
                 double cpri = c.clusteringPrecision(g, aClusters.getClustersNum());
 
                 clusteringPrecision += cpri;
-                divider++;
             }
         }
 
@@ -128,12 +126,16 @@ public class ClusteringAccuracy {
         int commonElements = 0;
         int totalElements = textsA.size() + textsB.size();
 
+        //todo: to totalElem. na einai to megethos tou G cluster
+
         // Count common elements (each text can only exist 1 time in a cluster btw)
         for (Integer i : textsA) {
             for (Integer j : textsB) {
                 if (i.equals(j)) {
                     // Add the 2 numbers to the common elements count
                     commonElements += 2;
+
+                    // todo: prosthetw 1 anti gia 2
 
                     // Continue on to next number
                     break;
