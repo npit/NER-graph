@@ -115,27 +115,23 @@ public class ClusteringAccuracy {
 
     /**
      * Find the percentage of common elements between 2 clusters
-     * @param a Cluster 1
-     * @param b Cluster 2
+     * @param g Ground truth cluster
+     * @param c Algorithm's output cluster
      * @return  Double, in range [0, 1]
      */
-    private double percentOfCommonItems(SimpleCluster a, SimpleCluster b) {
-        ArrayList<Integer> textsA = a.getTexts();
-        ArrayList<Integer> textsB = b.getTexts();
+    private double percentOfCommonItems(SimpleCluster g, SimpleCluster c) {
+        ArrayList<Integer> gTexts = g.getTexts();
+        ArrayList<Integer> cTexts = c.getTexts();
 
         int commonElements = 0;
-        int totalElements = textsA.size() + textsB.size();
+        int totalElements = gTexts.size();
 
-        //todo: to totalElem. na einai to megethos tou G cluster
-
-        // Count common elements (each text can only exist 1 time in a cluster btw)
-        for (Integer i : textsA) {
-            for (Integer j : textsB) {
+        // Count common elements (each text can only exist 1 time in g cluster btw)
+        for (Integer i : gTexts) {
+            for (Integer j : cTexts) {
                 if (i.equals(j)) {
-                    // Add the 2 numbers to the common elements count
-                    commonElements += 2;
-
-                    // todo: prosthetw 1 anti gia 2
+                    // Count common element
+                    commonElements++;
 
                     // Continue on to next number
                     break;
