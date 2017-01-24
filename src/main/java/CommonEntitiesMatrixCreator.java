@@ -101,6 +101,8 @@ public class CommonEntitiesMatrixCreator {
         int numOfTexts = texts.size();
         Matrix mtrx = new Matrix(numOfTexts, numOfTexts);
 
+        int zeroCommons = 0;
+
         // For all text combinations add common entities % to the matrix
         for (int i = 0; i < numOfTexts; i++) {
             for (int j = 0; j < i + 1; j++) {
@@ -140,9 +142,16 @@ public class CommonEntitiesMatrixCreator {
                     // Set the result on the 2 positions of the matrix (symmetric matrix)
                     mtrx.set(i, j, result);
                     mtrx.set(j, i, result);
+
+                    // If there were no common entities, count it for printing stats later
+                    if (commonEntities == 0) {
+                        zeroCommons++;
+                    }
                 }
             }
         }
+
+        System.out.println("Comparisons which had 0 common entities: " + zeroCommons);
 
         // Print matrix
         for (int i = 0; i < numOfTexts; i++) {
