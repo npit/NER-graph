@@ -61,6 +61,25 @@ public class ExtractedEntity {
     }
 
     @Override
+    public int hashCode() {
+        // Return hashcode of name
+        return this.name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        // Assume that same name == same entity
+        if (!(obj instanceof ExtractedEntity))
+            return false;
+        if (obj == this)
+            return true;
+
+        ExtractedEntity rhs = (ExtractedEntity) obj;
+
+        return (rhs.getName().equals(this.getName()));
+    }
+
+    @Override
     public String toString() {
         return "[Entity] name: " + this.name + " | type: " + this.type + " | " +
                 "offset: " + this.offset + " | length: " + this.length;
