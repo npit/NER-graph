@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.*;
 
 /**
@@ -111,21 +112,23 @@ public class CommonEntitiesMatrixCreator {
                     TextEntities text1 = texts.get(i);
                     TextEntities text2 = texts.get(j);
 
-                    // Get total entities (todo: maybe should be UNIQUE entities?)
-                    int totalEntities = text1.getEntities().size() + text2.getEntities().size();
+                    // Get total number of unique entities
+                    ArrayList<ExtractedEntity> allEntities = new ArrayList<>();
+                    allEntities.addAll(text1.getEntities());
+                    allEntities.addAll(text2.getEntities());
+                    int totalEntities = uniqueEntities(allEntities).size();
 
                     // Assuming that same "name" attribute == same entity, find the common ones
                     int commonEntities = 0;
 
-                    // For each entity of text1, check if there is one in the other text with the same name
-                    for (ExtractedEntity text1Entity : text1.getEntities()) {
-                        for (ExtractedEntity text2Entity : text2.getEntities()) {
+                    // For each (unique) entity of text1, check if there is one in the other text with the same name
+                    for (ExtractedEntity text1Entity : uniqueEntities(text1.getEntities())) {
+                        for (ExtractedEntity text2Entity : uniqueEntities(text2.getEntities())) {
                             if (text1Entity.getName().equals(text2Entity.getName())) {
                                 // Count entity as existing in both texts
                                 commonEntities++;
 
-                                // Since the text1Entity exists in the 2nd text, we don't need to look at text 2's other
-                                // entities
+                                // We found that the entity exists in text2, so skip other entities of text 2
                                 break;
                             }
                         }
@@ -171,5 +174,24 @@ public class CommonEntitiesMatrixCreator {
         } catch(IOException e) {
             System.err.println("Couldn't write file :( " + e.getMessage());
         }
+    }
+
+    /**
+     * Gets a list of extracted entities, and returns another one which contains each entity only once
+     * (compares them by name)
+     * @param entities  Entities with duplicates
+     * @return          Entities without duplicates
+     */
+    private List<ExtractedEntity> uniqueEntities(List<ExtractedEntity> entities) {
+        List<ExtractedEntity> unique = new ArrayList<>();
+
+        for (ExtractedEntity e : entities) {
+            // If the entity is not in the unique list, add it
+            if (!unique.contains(e)) {
+                unique.add(e);
+            }
+        }
+
+        return unique;
     }
 }
