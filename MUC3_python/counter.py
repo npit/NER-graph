@@ -18,7 +18,7 @@ def get_text_type(path, file):
 def main():
     temp_file = "temp-all.csv"
     texts_path = "../texts/input-all/"
-    print_individual_texts = False
+    # print_individual_texts = False
 
     same = 0
     different = 0
@@ -46,7 +46,6 @@ def main():
         gold_index = headers.index("GOLD")
         w_diff_index = headers.index("word difference")
         elki_index = headers.index("PH (A) NVS")
-        # elki_index = headers.index("GOLD")
 
         # Read data rows
         for row in reader:
@@ -63,7 +62,7 @@ def main():
             elki_array.append(str(text_ids[text1]) + " " +
                               str(text_ids[text2]) + " " +
                               str((1.0 - float(row[elki_index]))) + "\n")
-                              # row[elki_index] + "\n")
+            # row[elki_index] + "\n")
 
             # If text categories are the same, write a 1, otherwise 0
             new_row = row
