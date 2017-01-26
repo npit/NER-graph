@@ -4,6 +4,7 @@ import entity_extractor.ExtractedEntity;
 import entity_extractor.OpenCalaisExtractor;
 import entity_extractor.TextEntities;
 import org.javatuples.Pair;
+import org.jsoup.Jsoup;
 import org.simmetrics.StringMetric;
 import org.simmetrics.metrics.StringMetrics;
 import utils.Percentage;
@@ -164,7 +165,11 @@ public class CommonEntitiesMatrixCreator {
                     String text1Str = text1.getText();
                     String text2Str = text2.getText();
 
-                    //todo: parse muc3 html and get only text
+                    // Assuming the dataset is in HTML format like MUC3, parse the HTML and get only the
+                    // text that is in the body. Comment the next 2 lines to prevent this parsing.
+                    text1Str = Jsoup.parse(text1Str).body().text();
+                    text2Str = Jsoup.parse(text2Str).body().text();
+
                     float cosSim = simMetric.compare(text1Str, text2Str);
 
                     cosineSimMatrix.set(i, j, cosSim);

@@ -72,5 +72,12 @@
             <artifactId>simmetrics-core</artifactId>
             <version>4.1.1</version>
         </dependency>
+
+        <!--Jsoup for parsing html-->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.10.2</version>
+        </dependency>
     </dependencies>
 </project>
