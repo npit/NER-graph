@@ -3,6 +3,7 @@ import entity_extractor.EntityExtractor;
 import entity_extractor.ExtractedEntity;
 import entity_extractor.OpenCalaisExtractor;
 import entity_extractor.TextEntities;
+import org.javatuples.Pair;
 import org.simmetrics.StringMetric;
 import org.simmetrics.metrics.StringMetrics;
 import utils.Percentage;
@@ -55,6 +56,7 @@ public class CommonEntitiesMatrixCreator {
         String inputFolder = "texts/input-" + textNumStr;
         String csvOutput = "common-entities-matrix-" + textNumStr + ".csv";
         String cosineCsvOutput = "cosine-sim-matrix-" + textNumStr + ".csv";
+        String rOutput = "r-data-" + textNumStr + ".csv";
 
         File input = new File(inputFolder);
         EntityExtractor entityExtractor = new OpenCalaisExtractor();
@@ -112,6 +114,9 @@ public class CommonEntitiesMatrixCreator {
         // Variable to count how many pairs had 0 common entities
         int haveCommonEntities = 0;
 
+        // List of pairs for use in R correlation test
+        ArrayList<Pair<Double, Double>> pairs = new ArrayList<>();
+
         // For all text combinations add common entities % to the matrix
         for (int i = 0; i < numOfTexts; i++) {
             for (int j = 0; j < i + 1; j++) {
@@ -119,6 +124,8 @@ public class CommonEntitiesMatrixCreator {
                     // If i equals j it is the same text with itself, so they have all the same entities
                     commonEntitiesMatrix.set(i, j, 1.0);
                     cosineSimMatrix.set(i, j, 1.0);
+
+                    pairs.add(new Pair<>(1.0, 1.0));
                 } else {
                     // Check how many common entities the texts have, and how many they have in total
                     TextEntities text1 = texts.get(i);
@@ -154,11 +161,17 @@ public class CommonEntitiesMatrixCreator {
                     commonEntitiesMatrix.set(j, i, result);
 
                     // Set the results for the cosine similarity matrix
-                    //todo: get only MUC3 text instead of all html
-                    float cosSim = simMetric.compare(text1.getText(), text2.getText());
+                    String text1Str = text1.getText();
+                    String text2Str = text2.getText();
+
+                    //todo: parse muc3 html and get only text
+                    float cosSim = simMetric.compare(text1Str, text2Str);
 
                     cosineSimMatrix.set(i, j, cosSim);
                     cosineSimMatrix.set(j, i, cosSim);
+
+                    // Set pair of common entities percentage & cosine sim. to the arraylist for use in R
+                    pairs.add(new Pair<>(result, (double) cosSim));
 
                     // If there were > 0 common entities, count it for printing stats later
                     if (commonEntities > 0) {
@@ -180,6 +193,7 @@ public class CommonEntitiesMatrixCreator {
         // Export matrices to CSV files
         writeMatrixToCsv(commonEntitiesMatrix, numOfTexts, csvOutput);
         writeMatrixToCsv(cosineSimMatrix, numOfTexts, cosineCsvOutput);
+        writePairsCsv(pairs, rOutput);
     }
 
     /**
@@ -194,6 +208,31 @@ public class CommonEntitiesMatrixCreator {
             }
 
             System.out.println();
+        }
+    }
+
+    /**
+     * Write an arraylist of pairs to a CSV
+     * @param pairs     Pairs arraylist
+     * @param filename  Output filename
+     */
+    private void writePairsCsv(ArrayList<Pair<Double, Double>> pairs, String filename) {
+        try {
+            PrintWriter writer = new PrintWriter(filename, "UTF-8");
+
+            // Add headers
+            writer.println("Common Entities, Cosine Similarity");
+
+            // Add data
+            for (Pair<Double, Double> p : pairs) {
+                writer.println(p.getValue0() + "," + p.getValue1());
+            }
+
+            writer.close();
+
+            System.out.println("Pairs CSV written successfully!");
+        } catch(IOException e) {
+            System.err.println("Couldn't write file :( " + e.getMessage());
         }
     }
 
