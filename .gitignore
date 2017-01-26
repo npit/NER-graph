@@ -45,3 +45,6 @@ MUC3_python/elki_distance_matrix.txt
 MUC3_python/elki_text_ids.txt
 MUC3_python/ground_truth_clusters.txt
 elkiout/
+
+# Python cache
+__pycache__/
