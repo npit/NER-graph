@@ -34,7 +34,7 @@ public class OpenCalaisExtractor implements EntityExtractor {
 
         // Setup api keys
         apiKeys = new ArrayList<>();
-        apiKeys.add("***REMOVED***");
+        apiKeys.add("YOUR_OPENCALAIS_API_KEY");
 
         // Setup cache/output folder
         this.output = new File(outputFolder);
