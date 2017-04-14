@@ -12,6 +12,11 @@ public class SimpleCluster {
         texts = new ArrayList<>();
     }
 
+    public SimpleCluster(String name) {
+        texts = new ArrayList<>();
+        this.name = name;
+    }
+
     public void addText(Integer textIndex) {
         texts.add(textIndex);
     }
@@ -44,6 +49,7 @@ public class SimpleCluster {
     /**
      * Return a list with the intersection of the two input lists. Assumes that each item will exist at most once
      * in each list.
+     *
      * @param listA
      * @param listB
      * @return List A ∩ List B
@@ -62,6 +68,7 @@ public class SimpleCluster {
 
     /**
      * Calculate the accuracy with which the input cluster "c" reproduces this cluster.
+     *
      * @param c Cluster to compare to
      * @return
      */
@@ -69,11 +76,12 @@ public class SimpleCluster {
         int commonItems = intersection(this.getTexts(), c.getTexts()).size();
         int cItems = c.getTexts().size();
 
-        return ((double)commonItems) / cItems;
+        return ((double) commonItems) / cItems;
     }
 
     /**
      * Calculate the completeness with which the input cluster "c" reproduces this cluster.
+     *
      * @param c Cluster to compare to
      * @return
      */
@@ -81,14 +89,15 @@ public class SimpleCluster {
         int commonItems = intersection(this.getTexts(), c.getTexts()).size();
         int thisItems = this.getTexts().size();
 
-        return ((double)commonItems) / thisItems;
+        return ((double) commonItems) / thisItems;
     }
 
     /**
      * Calculate the precision with which this cluster (assuming it is created by an algorithm) reproduces the given
      * ground truth cluster ("g")
-     * @param g             Ground truth cluster that is mapped to this one
-     * @param clustersNum   Number of clusters that the algorithm output(ted)
+     *
+     * @param g           Ground truth cluster that is mapped to this one
+     * @param clustersNum Number of clusters that the algorithm output(ted)
      * @return
      */
     public double clusteringPrecision(SimpleCluster g, int clustersNum) {
@@ -121,6 +130,6 @@ public class SimpleCluster {
 //        System.out.println("cpri: " + ((double) commonPairs) / divider);
 
         // Divide them
-        return ((double)commonPairs) / divider;
+        return ((double) commonPairs) / divider;
     }
 }

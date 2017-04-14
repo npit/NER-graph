@@ -4,6 +4,7 @@ import clustering.accuracy_measures.Clusters;
 import clustering.accuracy_measures.SimpleCluster;
 import clustering.accuracy_measures.data.ClustersData;
 import clustering.accuracy_measures.data.ElkiOpticsXiData;
+import clustering.accuracy_measures.data.RandomData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +21,18 @@ public class ClusteringAccuracy {
     }
 
     private void start() {
-        ClustersData data = new ElkiOpticsXiData("elkiout", "MUC3_python/ground_truth_clusters.txt");
+        String groundTruthPath = "MUC3_python/ground_truth_clusters.txt";
+
+        System.out.println("\n\nELKI CLUSTERING RESULTS");
+        ClustersData data = new ElkiOpticsXiData("elkiout", groundTruthPath);
+        clusteringAccuracy(data);
+
+        System.out.println("\n\nRANDOM CLUSTERING RESULTS");
+        data = new RandomData(100, groundTruthPath);
+        clusteringAccuracy(data);
+    }
+
+    private void clusteringAccuracy(ClustersData data) {
         Clusters gClusters = data.getGroundTruthClusters();
         Clusters aClusters = data.getAlgorithmClusters();
         int textsNum = data.numOfTexts();
@@ -44,14 +56,15 @@ public class ClusteringAccuracy {
                 }
             }
 
-            System.out.println("f(" + g.getName() + ") = " + f.get(g).getName() + " --> " + String.format("%1$,.4f", highestPercent * 100 ) + " % of common items");
+            System.out.println("f(" + g.getName() + ") = " + f.get(g).getName() + " --> " + String.format("%1$,.4f", highestPercent * 100) + " % of common items");
         }
+        System.out.println();
 
         // Calculate Pr (weighted avg. of PRi's over all ground truth clusters)
         double precision = 0;
 
         for (SimpleCluster g : gClusters.getClusters()) {
-            double weight = ((double)g.getTexts().size()) / textsNum;
+            double weight = ((double) g.getTexts().size()) / textsNum;
 
             precision += weight * g.precision(f.get(g));
         }
@@ -63,7 +76,7 @@ public class ClusteringAccuracy {
         double recall = 0;
 
         for (SimpleCluster g : gClusters.getClusters()) {
-            double weight = ((double)g.getTexts().size()) / textsNum;
+            double weight = ((double) g.getTexts().size()) / textsNum;
 
             recall += weight * g.recall(f.get(g));
         }
@@ -102,10 +115,10 @@ public class ClusteringAccuracy {
         double multiplier;
         if (gClusters.getClustersNum() < aClusters.getClustersNum()) {
             // Will do k/k' * CPr
-            multiplier = ((double)gClusters.getClustersNum()) / aClusters.getClustersNum();
+            multiplier = ((double) gClusters.getClustersNum()) / aClusters.getClustersNum();
         } else {
             // Will do k'/k * CPr
-            multiplier = ((double)aClusters.getClustersNum()) / gClusters.getClustersNum();
+            multiplier = ((double) aClusters.getClustersNum()) / gClusters.getClustersNum();
         }
 
         double pcpr = multiplier * clusteringPrecision;
@@ -115,9 +128,10 @@ public class ClusteringAccuracy {
 
     /**
      * Find the percentage of common elements between 2 clusters
+     *
      * @param g Ground truth cluster
      * @param c Algorithm's output cluster
-     * @return  Double, in range [0, 1]
+     * @return Double, in range [0, 1]
      */
     private double percentOfCommonItems(SimpleCluster g, SimpleCluster c) {
         ArrayList<Integer> gTexts = g.getTexts();
@@ -140,6 +154,6 @@ public class ClusteringAccuracy {
         }
 
         // Return common / total elements
-        return ((double)commonElements) / totalElements;
+        return ((double) commonElements) / totalElements;
     }
 }
