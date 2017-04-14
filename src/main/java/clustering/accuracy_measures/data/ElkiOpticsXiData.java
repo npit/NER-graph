@@ -2,8 +2,11 @@ package clustering.accuracy_measures.data;
 
 import clustering.accuracy_measures.Clusters;
 import clustering.accuracy_measures.SimpleCluster;
+import utils.GroundTruthReader;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Reads the output folder of ELKI for the OPTICSXi algorithm to provide the clustering results to the rest of the
@@ -17,7 +20,7 @@ public class ElkiOpticsXiData implements ClustersData {
     public ElkiOpticsXiData(String elkiClustersPath, String groundTruthFilePath) {
         // Initialize variables
         algClusters = new Clusters();
-        groundTruth = new Clusters();
+        groundTruth = GroundTruthReader.getClusters(groundTruthFilePath);
         textsNum = -1;
 
         // Get algorithm clusters from OPTICSXi ELKI output folder
@@ -33,51 +36,22 @@ public class ElkiOpticsXiData implements ClustersData {
             }
         }
 
-        // Get ground truth clusters from python-exported ground truth text file
-        try {
-            // Open the file
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(new FileInputStream(new File(groundTruthFilePath)), "UTF-8"));
-
-            // For each line (which represents a ground truth cluster) read its name and the text IDs that are in it
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Split line into cluster "name" and ids that are in it
-                String[] parts = line.split("\\|");
-
-                // Get name and IDs
-                String coverageStr = parts[0];
-                String[] ids = parts[1].split(" ");
-
-                // Create the new cluster
-                SimpleCluster c = new SimpleCluster();
-                c.setName(coverageStr);
-
-                // Add each ID to the new cluster
-                for (String idStr : ids) {
-                    Integer id = Integer.parseInt(idStr);
-
-                    c.addText(id);
-
-                    // Keep the largest ID, because that will be the texts number later
-                    if (id + 1 > this.textsNum) {
-                        this.textsNum = id + 1;
-                    }
-                }
-
-                // Add the cluster to the other clusters
-                groundTruth.addCluster(c);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        // Generate array of all texts in order to find largest ID
+        ArrayList<Integer> allTextIDs = new ArrayList<>();
+        for (SimpleCluster sc : algClusters.getClusters()) {
+            allTextIDs.addAll(sc.getTexts());
         }
+
+        // Number of texts is the largest ID + 1
+        this.textsNum = Collections.max(allTextIDs) + 1;
     }
 
     /**
      * Get a file that is an OPTICSXi cluster from ELKI, and create a SimpleCluster from it.
      * Sets the name (if found in the file, which it should) and adds the cluster IDs.
+     *
      * @param f File to read
-     * @return  Cluster made from ELKI output file
+     * @return Cluster made from ELKI output file
      */
     private SimpleCluster getClusterFromFile(File f) {
         SimpleCluster c = new SimpleCluster();

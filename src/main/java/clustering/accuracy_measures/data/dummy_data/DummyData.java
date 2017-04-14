@@ -1,7 +1,8 @@
-package clustering.accuracy_measures.data;
+package clustering.accuracy_measures.data.dummy_data;
 
 import clustering.accuracy_measures.Clusters;
 import clustering.accuracy_measures.SimpleCluster;
+import clustering.accuracy_measures.data.ClustersData;
 
 /**
  * Create dummy cluster data to test accuracy measures with before implementing the actual class that will read
@@ -13,7 +14,7 @@ public class DummyData implements ClustersData {
     int textsNum = 10;
 
     public DummyData() {
-        // Create dummy data
+        // Create dummy_data data
         clusters = new Clusters();
         groundTruth = new Clusters();
 

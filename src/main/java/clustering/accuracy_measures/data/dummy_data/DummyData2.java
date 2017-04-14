@@ -1,4 +1,4 @@
-package clustering.accuracy_measures.data;
+package clustering.accuracy_measures.data.dummy_data;
 
 import clustering.accuracy_measures.SimpleCluster;
 
