@@ -17,9 +17,11 @@ public class RandomData implements ClustersData {
         this.textsNumber = textsNumber;
         groundTruth = GroundTruthReader.getClusters(groundTruthFilePath);
 
-        // Decide on number of clusters (it will be the max number, and will range from having all texts in 1 cluster,
-        // to each text being in a separate cluster on its own)
-        int clustersNum = ThreadLocalRandom.current().nextInt(1, textsNumber + 1);
+        // Decide on number of clusters (it will be the max number, and within 20% of the correct number)
+        int correctClustersNum = groundTruth.getClustersNum();
+        int twentyPercent = Math.round(correctClustersNum * 0.2f);
+
+        int clustersNum = ThreadLocalRandom.current().nextInt(correctClustersNum - twentyPercent, correctClustersNum + twentyPercent);
 
         // Create empty clusters
         ArrayList<SimpleCluster> rngClusters = new ArrayList<>();
