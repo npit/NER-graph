@@ -46,5 +46,11 @@ MUC3_python/elki_text_ids.txt
 MUC3_python/ground_truth_clusters.txt
 elkiout/
 
+# for symlink:
+elkiout
+
+# directory for 20 newsgroups dataset data
+20NG_data/
+
 # Python cache
 __pycache__/
