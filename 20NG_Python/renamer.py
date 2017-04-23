@@ -26,8 +26,8 @@ def main():
 
                 # Rename all files
                 [os.rename(group_path + "\\" + f,
-                           group_path + "\\" + group + "_" + f) for f in
-                 os.listdir(group_path)]
+                           group_path + "\\" + dir_key + "_" + group + "_" + f)
+                 for f in os.listdir(group_path)]
 
 
 if __name__ == "__main__":
