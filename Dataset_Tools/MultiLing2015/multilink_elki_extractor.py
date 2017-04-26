@@ -79,6 +79,11 @@ def main():
     with open(elki_distance_matrix_path, "w") as elki_f:
         elki_f.writelines(elki_array)
 
+    # Write file with filename -> ELKI ID mapping
+    with open(elki_text_ids_path, "w") as elki_f:
+        for text in text_ids:
+            elki_f.write(text + " " + str(text_ids[text]) + "\n")
+
 
 if __name__ == "__main__":
     main()
