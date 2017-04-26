@@ -99,7 +99,7 @@ def main():
                     elki_array.append(
                         str(text_ids[text1]) + " " +
                         str(text_ids[text2]) + " " +
-                        str((1.0 - float(row[elki_index]))) + "\n")
+                        str(1.0 - float(row[elki_index])) + "\n")
 
                     # If text categories are the same, write a 1, otherwise 0
                     new_row = row

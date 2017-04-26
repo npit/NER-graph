@@ -41,9 +41,9 @@ texts/
 *.7z
 
 #ignore output files of python script for elki
-MUC3_python/elki_distance_matrix.txt
-MUC3_python/elki_text_ids.txt
-MUC3_python/ground_truth_clusters.txt
+elki_distance_matrix.txt
+elki_text_ids.txt
+ground_truth_clusters.txt
 elkiout/
 
 # for symlink:
