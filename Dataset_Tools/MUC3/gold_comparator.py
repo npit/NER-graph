@@ -34,7 +34,7 @@ def main():
     clustering_column = "PH (A) NVS"
 
     # INPUT SETTINGS
-    texts_folder = "../texts/input/"
+    texts_folder = "../../texts/input-100/"
     input_csv = "../out-100.csv"
 
     # OUTPUT SETTINGS
@@ -164,7 +164,7 @@ def main():
                         # Categories different, maximum 0.5 similarity
                         similarity = common_to_all / 2.0
 
-                        # Keep stats for different cateogry texts
+                        # Keep stats for different category texts
                         different += 1
                         word_diffs["diff"].append(diff)
                         ratios["diff"].append(common_to_all)
@@ -239,6 +239,7 @@ def main():
     with open(elki_distance_matrix_path, "w") as elki_f:
         elki_f.writelines(elki_array)
 
+    # Write file with filename -> ELKI ID mapping
     with open(elki_text_ids_path, "w") as elki_f:
         for text in text_ids:
             elki_f.write(text + " " + str(text_ids[text]) + "\n")

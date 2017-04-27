@@ -37,6 +37,7 @@ def main():
     # ELKI variables
     text_ids = {}
     elki_array = []
+    category_contents = {}
 
     # Get categories of texts of MultiLing dataset
     text_categories = get_text_categories(texts_folder)
@@ -60,9 +61,20 @@ def main():
                 # Create text ID if it doesn't have one already
                 if text_name not in text_ids:
                     text_ids[text_name] = len(text_ids)
+                text_id = text_ids[text_name]
 
                 # Add the text to the ELKI distance matrix line
-                elki_array_line += str(text_ids[text_name]) + " "
+                elki_array_line += str(text_id) + " "
+
+                # Get text's category
+                text_type = text_categories[text_name]
+
+                # Create category if it doesn't exist, and add text to it
+                if text_type not in category_contents:
+                    category_contents[text_type] = []
+
+                if text_id not in category_contents[text_type]:
+                    category_contents[text_type].append(text_id)
 
             # Finish the elki array line and append it to the array
             elki_array_line += str(1.0 - float(row[elki_index])) + "\n"
@@ -83,6 +95,12 @@ def main():
     with open(elki_text_ids_path, "w") as elki_f:
         for text in text_ids:
             elki_f.write(text + " " + str(text_ids[text]) + "\n")
+
+    # Write file for use in importing ground truth clusters to Java program
+    with open(ground_truth_clusters_path, "w") as gt_f:
+        for cluster_name in category_contents:
+            gt_f.write(cluster_name + "|" + str(" ".join(
+                str(item) for item in category_contents[cluster_name])) + "\n")
 
 
 if __name__ == "__main__":
