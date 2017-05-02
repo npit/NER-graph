@@ -44,6 +44,7 @@ texts/
 elki_distance_matrix.txt
 elki_text_ids.txt
 ground_truth_clusters.txt
+elkiout.txt
 elkiout/
 
 # for symlink:
