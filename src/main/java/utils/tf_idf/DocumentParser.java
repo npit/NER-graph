@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,6 +42,9 @@ public class DocumentParser {
                 }
                 String[] tokenizedTerms = sb.toString().replaceAll("[\\W&&[^\\s]]", "").split("\\W+");   //to get individual terms
                 for (String term : tokenizedTerms) {
+                    // Make term always uppercase, to further prevent duplicates
+                    term = term.toUpperCase();
+
                     if (!allTerms.contains(term)) {  //avoid duplicate entry
                         allTerms.add(term);
                     }
@@ -111,7 +115,9 @@ public class DocumentParser {
                 return d1.compareTo(d2);
             });
 
-            System.out.println(terms);
+            // Reverse the list in order to make the top terms be first
+            Collections.reverse(terms);
+
             return terms;
         }
 
