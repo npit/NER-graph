@@ -64,14 +64,16 @@ public class DocumentParser {
         double idf;     //inverse document frequency
         double tfidf;   //term frequency inverse document frequency
 
+        TfIdf tdIdfUtil = new TfIdf();
+
         // For each document, calculate its vector
         for (int i = 0; i < termsDocsArray.size(); i++) {
             String[] docTermsArray = termsDocsArray.get(i);
             double[] tfidfvectors = new double[allTerms.size()];
             int count = 0;
             for (String terms : allTerms) {
-                tf = new TfIdf().tfCalculator(docTermsArray, terms);
-                idf = new TfIdf().idfCalculator(termsDocsArray, terms);
+                tf = tdIdfUtil.tfCalculator(docTermsArray, terms);
+                idf = tdIdfUtil.idfCalculator(termsDocsArray, terms);
                 tfidf = tf * idf;
                 tfidfvectors[count] = tfidf;
                 count++;

@@ -8,7 +8,6 @@ import java.util.List;
  * @author Mubin Shrestha
  */
 public class TfIdf {
-
     /**
      * Calculates the tf of term termToCheck
      *
