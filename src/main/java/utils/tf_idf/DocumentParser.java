@@ -1,5 +1,7 @@
 package utils.tf_idf;
 
+import org.javatuples.Pair;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -8,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class to read documents
+ * Class to read documents (modified)
  *
  * @author Mubin Shrestha
  */
@@ -72,6 +74,48 @@ public class DocumentParser {
             }
             tfidfDocsVector.add(tfidfvectors);  //storing document vectors;
         }
+    }
+
+    /**
+     * Get a sorted list of the top terms of a document, ranked by TF-IDF
+     *
+     * @param docName
+     * @return
+     */
+    public List<Pair<String, Double>> getSortedDocumentTerms(String docName) {
+        // Check that the requested document exists
+        if (docNames.contains(docName)) {
+            // Get document index and
+            int docIndex = docNames.indexOf(docName);
+            double[] tfIdfVector = tfidfDocsVector.get(docIndex);
+
+            // Create the list of pairs
+            List<Pair<String, Double>> terms = new ArrayList<>();
+
+            int termsLen = allTerms.size();
+            for (int i = 0; i < termsLen; i++) {
+                String term = allTerms.get(i);
+                double termRank = tfIdfVector[i];
+
+                terms.add(new Pair<>(term, termRank));
+            }
+
+            // Remove words with 0 rank value
+            terms.removeIf(obj -> obj.getValue1().equals(0.0));
+
+            // Sort the list with comparator which compares the doubles
+            terms.sort((o1, o2) -> {
+                Double d1 = o1.getValue1();
+                Double d2 = o2.getValue1();
+
+                return d1.compareTo(d2);
+            });
+
+            System.out.println(terms);
+            return terms;
+        }
+
+        return null;
     }
 
     /**
