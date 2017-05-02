@@ -3,6 +3,7 @@ import csv_export.ComparisonContainer;
 import entity_extractor.*;
 import utils.Percentage;
 import utils.VerySimpleFormatter;
+import utils.tf_idf.DocumentParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +19,8 @@ import java.util.logging.*;
  * with all other texts with all the available methods, and outputs the results to a CSV file (and a log file)
  */
 public class TextComparator {
-    private final static boolean cacheGraphs = true;
+    private final static boolean cacheGraphs = true;    // Enable/disable caching of the graphs in memory for speed, but can use a lot of RAM
+    private final static boolean keepTopTerms = true;   // If true, will leave top terms (ranked by TF-IDF) in the text when making the graphs
 
     private final Logger LOGGER = Logger.getLogger("NamedEntityGraph");
 
@@ -27,7 +29,7 @@ public class TextComparator {
 
         try {
             neg.start();
-        } catch(IOException e) {
+        } catch (IOException e) {
             System.err.println("Problem writing log file");
         }
     }
@@ -65,7 +67,17 @@ public class TextComparator {
 
         try {
             if (input.isDirectory()) {
-                LOGGER.log(Level.INFO, "working on all files in " + input.getAbsolutePath());
+                LOGGER.log(Level.INFO, "Working on all files in " + input.getAbsolutePath());
+
+                // Calculate TF-IDF of documents, so we can keep top terms
+                DocumentParser dp = new DocumentParser();
+                if (keepTopTerms) {
+                    dp.parseFiles(input.getPath());
+                    dp.tfIdfCalculator();
+                }
+
+                // Get text entities and create graphs (if we should cache them)
+                LOGGER.log(Level.INFO, "TF-IDF Calculation complete, getting text entities...");
                 File[] files = input.listFiles();
                 if (files != null) {
                     int i = 1;
@@ -91,7 +103,7 @@ public class TextComparator {
                             texts.add(entities);
 
                             // Calculate graphs for this text and save them (if caching is enabled)
-                            GraphCache cache = new GraphCache(entities);
+                            GraphCache cache = new GraphCache(entities, dp);
                             if (cacheGraphs) {
                                 cache.calculateGraphs(entities, placeholders);
                             }
@@ -122,7 +134,7 @@ public class TextComparator {
         int cores = Runtime.getRuntime().availableProcessors();
         LOGGER.log(Level.INFO, "Using " + cores + " cores...");
 
-        ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(cores);
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(cores);
 
         // Start a thread for each CPU core
         for (int i = 0; i < cores; i++) {

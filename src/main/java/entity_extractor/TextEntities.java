@@ -1,6 +1,7 @@
 package entity_extractor;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
 
@@ -55,8 +56,9 @@ public class TextEntities {
 
     /**
      * Join an array list of strings into a single string, each string separated from each other with the wordSeparator
-     * @param stringList    List of strings
-     * @return              List of strings joined to a single string
+     *
+     * @param stringList List of strings
+     * @return List of strings joined to a single string
      */
     private String getStringFromArrayList(ArrayList<String> stringList) {
         StringBuilder sb = new StringBuilder();
@@ -70,8 +72,9 @@ public class TextEntities {
 
     /**
      * Return a string that is the original text, with every word that is not an entity replaced by a placeholder
-     * @param placeholder   Word to replace non-entity words with
-     * @return              Text with non-entity words replaced by the placeholder
+     *
+     * @param placeholder Word to replace non-entity words with
+     * @return Text with non-entity words replaced by the placeholder
      */
     public String getEntityTextWithPlaceholders(String placeholder) {
         int wordsNum = this.getNumberOfWordsInText();
@@ -95,11 +98,57 @@ public class TextEntities {
     }
 
     /**
+     * Return a string that is the original text, with every word that is not an entity replaced by a placeholder.
+     * Also keeps in the text the top percentage of words from the topTerms specified.
+     *
+     * @param placeholder Word to replace non-entity words with
+     * @param topTerms    Terms of the text, ranked by highest to lowest
+     * @return Text with non-entity words replaced by the placeholder
+     */
+    public String getEntityTextWithPlaceholders(String placeholder, List<String> topTerms) {
+        // Keep top 5% of words
+        int termsToKeep = Math.round(topTerms.size() * 0.05f);
+
+        topTerms = topTerms.subList(0, termsToKeep);
+//        System.out.println("top terms: " + topTerms);
+
+        // Create string that is the same number of words as original text but all words are the placeholder word
+        int wordsNum = this.getNumberOfWordsInText();
+        ArrayList<String> entityTextWords = new ArrayList<>(wordsNum);
+
+        for (int i = 0; i < wordsNum; i++) {
+            entityTextWords.add(i, placeholder);
+        }
+
+        // Replace words that should be entities with their entity names
+        for (ExtractedEntity e : entities) {
+            int index = getEntityIndex(e.getOffset());
+
+            entityTextWords.set(index, e.getHash());
+        }
+//        System.out.println("TEXT: " + text.replaceAll("\n", " "));
+//        System.out.println("before terms: " + getStringFromArrayList(entityTextWords));
+
+        // Put top terms back in the text
+        for (String term : topTerms) {
+            List<Integer> indexes = getWordIndexes(term);
+            for (int index : indexes) {
+                entityTextWords.set(index, term);
+            }
+        }
+//        System.out.println("AFTER terms: " + getStringFromArrayList(entityTextWords));
+
+        // Create string from the array list
+        return getStringFromArrayList(entityTextWords);
+    }
+
+    /**
      * Return a string that is the original text, with every non-entity word replaced by a placeholder of the same size.
      * The placeholder word is repeated multiple times until its length exceeds that of the original word and is then
      * trimmed to be the exact size of the original word.
-     * @param placeholder   Word to replace non-entity words with
-     * @return              The text in the described form
+     *
+     * @param placeholder Word to replace non-entity words with
+     * @return The text in the described form
      */
     public String getEntityTextWithPlaceholderSameSize(String placeholder) {
         int numOfWords = this.getNumberOfWordsInText();
@@ -109,7 +158,7 @@ public class TextEntities {
         ArrayList<String> words = new ArrayList<>(numOfWords);
 
         int tokenIndex = 0;
-        while(st.hasMoreTokens()) {
+        while (st.hasMoreTokens()) {
             words.add(tokenIndex++, st.nextToken());
         }
 
@@ -143,7 +192,8 @@ public class TextEntities {
 
     /**
      * Return a string that is the original text with every non-entity word replaced by a random word of the same size
-     * @return  The text in the described form
+     *
+     * @return The text in the described form
      */
     public String getEntityTextWithRandomWord() {
         Random r = new Random();
@@ -156,7 +206,7 @@ public class TextEntities {
 
 
         int tokenIndex = 0;
-        while(st.hasMoreTokens()) {
+        while (st.hasMoreTokens()) {
             words.add(tokenIndex++, st.nextToken());
         }
 
@@ -193,6 +243,23 @@ public class TextEntities {
         StringTokenizer st = new StringTokenizer(text, wordSeparator);
 
         return st.countTokens();
+    }
+
+    private List<Integer> getWordIndexes(String word) {
+        StringTokenizer st = new StringTokenizer(text, wordSeparator);
+        List<Integer> indexes = new ArrayList<>();
+
+        int index = 0;
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken();
+            if (token.toUpperCase().equals(word)) {
+                indexes.add(index);
+            }
+
+            index++;
+        }
+
+        return indexes;
     }
 
     private int getEntityIndex(int offset) {
