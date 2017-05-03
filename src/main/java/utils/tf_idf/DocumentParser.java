@@ -39,8 +39,9 @@ public class DocumentParser {
                 String s = null;
                 while ((s = in.readLine()) != null) {
                     sb.append(s);
+                    sb.append(" ");
                 }
-                String[] tokenizedTerms = sb.toString().replaceAll("[\\W&&[^\\s]]", "").split("\\W+");   //to get individual terms
+                String[] tokenizedTerms = sb.toString().replaceAll("[\\W&&[^\\s]]", " ").split("\\W+");   //to get individual terms
                 for (String term : tokenizedTerms) {
                     // Make term always uppercase, to further prevent duplicates
                     term = term.toUpperCase();
