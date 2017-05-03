@@ -1,6 +1,8 @@
 package utils.tf_idf;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Source: https://gist.github.com/guenodz/d5add59b31114a3a3c66
@@ -8,6 +10,12 @@ import java.util.List;
  * @author Mohamed Guendouz
  */
 public class TFIDFCalculator {
+    Map<String, Double> idfCache;
+
+    public TFIDFCalculator() {
+        idfCache = new HashMap<>();
+    }
+
     /**
      * @param doc  list of strings
      * @param term String represents a term
@@ -29,17 +37,26 @@ public class TFIDFCalculator {
      * @return the inverse term frequency of term in documents
      */
     public double idf(List<List<String>> docs, String term) {
-        double n = 0;
-        for (List<String> doc : docs) {
-            for (String word : doc) {
-                if (term.equalsIgnoreCase(word)) {
-                    n++;
-                    break;
+        if (idfCache.containsKey(term)) {
+            // If the result is in the cache, get its IDF from there
+            return idfCache.get(term);
+        } else {
+            // Calculate the IDF
+            double n = 0;
+            for (List<String> doc : docs) {
+                for (String word : doc) {
+                    if (term.equalsIgnoreCase(word)) {
+                        n++;
+                        break;
+                    }
                 }
             }
-        }
 
-        return Math.log(docs.size() / n);
+            double idfValue = Math.log(docs.size() / n);
+
+            idfCache.put(term, idfValue);
+            return idfValue;
+        }
     }
 
     /**
