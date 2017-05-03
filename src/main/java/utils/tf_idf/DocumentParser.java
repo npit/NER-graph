@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -52,7 +53,14 @@ public class DocumentParser {
                 }
 
                 docNames.add(f.getName());
-                termsDocsArray.add(tokenizedTerms);
+
+                int termsNum = tokenizedTerms.length;
+                String[] tokenizedNormalizedTerms = new String[termsNum];
+                for (int i = 0; i < termsNum; i++) {
+                    tokenizedNormalizedTerms[i] = tokenizedTerms[i].toUpperCase();
+                }
+
+                termsDocsArray.add(tokenizedNormalizedTerms);
             }
         }
     }
@@ -61,24 +69,29 @@ public class DocumentParser {
      * Method to create termVector according to its tfidf score.
      */
     public void tfIdfCalculator() {
-        double tf;      //term frequency
-        double idf;     //inverse document frequency
+        TFIDFCalculator calculator = new TFIDFCalculator();
         double tfidf;   //term frequency inverse document frequency
 
-        TfIdf tdIdfUtil = new TfIdf();
+        // Create values for TFIDFCalculator class (lists)
+        List<List<String>> documents = new ArrayList<>();
+        for (String[] docTerms : termsDocsArray) {
+            documents.add(Arrays.asList(docTerms));
+        }
 
         // For each document, calculate its vector
-        for (int i = 0; i < termsDocsArray.size(); i++) {
-            String[] docTermsArray = termsDocsArray.get(i);
+        for (int docIndex = 0; docIndex < termsDocsArray.size(); docIndex++) {
+            String[] docTermsArray = termsDocsArray.get(docIndex);
+            List<String> docTermsList = Arrays.asList(docTermsArray);
+
             double[] tfidfvectors = new double[allTerms.size()];
+
             int count = 0;
-            for (String terms : allTerms) {
-                tf = tdIdfUtil.tfCalculator(docTermsArray, terms);
-                idf = tdIdfUtil.idfCalculator(termsDocsArray, terms);
-                tfidf = tf * idf;
+            for (String term : allTerms) {
+                tfidf = calculator.tfIdf(docTermsList, documents, term);
                 tfidfvectors[count] = tfidf;
                 count++;
             }
+
             tfidfDocsVector.add(tfidfvectors);  //storing document vectors;
         }
     }

@@ -2,11 +2,11 @@ package utils.tf_idf;
 
 /**
  * Cosine similarity calculator class
+ * Source: http://computergodzilla.blogspot.gr/2013/07/how-to-calculate-tf-idf-of-document.html
  *
  * @author Mubin Shrestha
  */
 public class CosineSimilarity {
-
     /**
      * Method to calculate cosine similarity between two documents.
      *
@@ -35,6 +35,7 @@ public class CosineSimilarity {
         } else {
             return 0.0;
         }
+
         return cosineSimilarity;
     }
 }
