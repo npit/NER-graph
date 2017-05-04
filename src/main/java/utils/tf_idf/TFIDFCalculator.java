@@ -10,7 +10,7 @@ import java.util.Map;
  * @author Mohamed Guendouz
  */
 public class TFIDFCalculator {
-    Map<String, Double> idfCache;
+    private Map<String, Double> idfCache;
 
     public TFIDFCalculator() {
         idfCache = new HashMap<>();
@@ -24,7 +24,7 @@ public class TFIDFCalculator {
     public double tf(List<String> doc, String term) {
         double result = 0;
         for (String word : doc) {
-            if (term.equalsIgnoreCase(word))
+            if (term.equals(word))
                 result++;
         }
 
@@ -45,7 +45,7 @@ public class TFIDFCalculator {
             double n = 0;
             for (List<String> doc : docs) {
                 for (String word : doc) {
-                    if (term.equalsIgnoreCase(word)) {
+                    if (term.equals(word)) {
                         n++;
                         break;
                     }
