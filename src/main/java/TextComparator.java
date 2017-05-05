@@ -4,6 +4,7 @@ import entity_extractor.*;
 import utils.Methods;
 import utils.Percentage;
 import utils.VerySimpleFormatter;
+import utils.tf_idf.DocumentOptimizedParser;
 import utils.tf_idf.DocumentParser;
 
 import java.io.File;
@@ -72,8 +73,6 @@ public class TextComparator {
 //        placeholders.add("-");
         placeholders.add("A");
 
-        long startTime = 0;
-        long endTime = 0;
         File input = new File(inputFolder);
         EntityExtractor entityExtractor = new OpenCalaisExtractor();
         ArrayList<TextEntities> texts = new ArrayList<>();
@@ -84,17 +83,8 @@ public class TextComparator {
             if (input.isDirectory()) {
                 LOGGER.log(Level.INFO, "Working on all files in " + input.getAbsolutePath());
 
-                // Calculate TF-IDF of documents, so we can keep top terms
-                startTime = System.currentTimeMillis();
-                DocumentParser dp = new DocumentParser();
-                if (keepTopTerms) {
-                    dp.parseFiles(input.getPath());
-                    dp.tfIdfCalculator();
-                }
-                endTime = System.currentTimeMillis();
-
                 // Get text entities and create graphs (if we should cache them)
-                LOGGER.log(Level.INFO, "TF-IDF Calculation complete, getting text entities...");
+                LOGGER.log(Level.INFO, "Getting text entities...");
                 File[] files = input.listFiles();
                 if (files != null) {
                     int i = 1;
@@ -116,15 +106,7 @@ public class TextComparator {
 
                             // Get entities for this file and save them
                             TextEntities entities = entityExtractor.getEntities(file);
-//                            entities.printEntities();
                             texts.add(entities);
-
-                            // Calculate graphs for this text and save them (if caching is enabled)
-                            GraphCache cache = new GraphCache(entities, dp);
-                            if (cacheGraphs) {
-                                cache.calculateGraphs(entities, placeholders);
-                            }
-                            graphs.put(entities.getTitle(), cache);
 
                             LOGGER.log(Level.FINE, "[main] Got " + entities.getEntities().size() + " extracted entities from " + file + "\n");
                         } else {
@@ -141,8 +123,78 @@ public class TextComparator {
             return;
         }
 
+        // Calculate TF-IDF of documents, so we can keep top terms
+        LOGGER.log(Level.INFO, "Calculating TF-IDF...");
+        long tfIdfStart = System.currentTimeMillis();
+        DocumentParser dp = new DocumentOptimizedParser();
+        if (keepTopTerms) {
+            dp.parseFiles(texts);
+        }
+        long tfIdfEnd = System.currentTimeMillis();
+
+//        DocumentParser old = new DocumentParser();
+//        old.parseFiles(texts);
+//        Map<String, List<Pair<String, Double>>> oldMap = new HashMap<>();
+//        for (TextEntities text : texts) {
+//            oldMap.put(text.getTitle(), old.getSortedDocumentTerms(text.getTitle()));
+//        }
+//        System.err.println("NOT OPTIMIZED:\n" + utils.printIterable(oldMap.entrySet(), "\n") + "\n\n");
+//
+//        for (String text : oldMap.keySet()) {
+//            // Get optimized one
+//            List<Pair<String, Double>> opt = dp.getSortedDocumentTerms(text);
+//            List<Pair<String, Double>> nonOpt = oldMap.get(text);
+//
+//            if (opt.size() != nonOpt.size()) {
+//                System.out.println("File " + text + " has different sizes! " + opt.size() + " vs " + nonOpt.size());
+//            } else {
+//                for (int i = 0; i < opt.size(); i++) {
+//                    if (!opt.get(i).getValue0().equals(nonOpt.get(i).getValue0())) {
+//                        // Check without caring about order
+//                        Set<String> oldSet = new HashSet<>();
+//                        for (Pair<String, Double> p : nonOpt) {
+//                            oldSet.add(p.getValue0());
+//                        }
+//                        Set<String> newSet = new HashSet<>();
+//                        for (Pair<String, Double> p : opt) {
+//                            newSet.add(p.getValue0());
+//                        }
+//
+//                        if (!oldSet.equals(newSet)) {
+//                            List<String> oldList = new ArrayList<>();
+//                            oldList.addAll(oldSet);
+//                            List<String> newList = new ArrayList<>();
+//                            newList.addAll(newSet);
+//
+//                            Collections.sort(oldList);
+//                            Collections.sort(newList);
+//
+//                            System.out.println("DIFFERENT VALUE (" + text + ")");
+//                            System.out.println("\t(old)=> " + oldList);
+//                            System.out.println("\t(new)=> " + newList);
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+        // Calculate graphs in advance
+        LOGGER.log(Level.INFO, "Calculating graphs...");
+        long graphCalculationStart = System.currentTimeMillis();
+        if (cacheGraphs) {
+            for (TextEntities entities : texts) {
+                GraphCache cache = new GraphCache(entities, dp);
+                cache.calculateGraphs(placeholders);
+                graphs.put(entities.getTitle(), cache);
+
+            }
+        }
+        long graphCalculationEnd = System.currentTimeMillis();
+
         // Compare every text with every other text
         LOGGER.log(Level.INFO, "Starting text comparisons...");
+        long comparisonsStart = System.currentTimeMillis();
 
         // List to keep all comparisons that were made to write them to CSV file
         List<ComparisonContainer> comparisons = Collections.synchronizedList(new ArrayList<ComparisonContainer>());
@@ -167,6 +219,7 @@ public class TextComparator {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        long comparisonsEnd = System.currentTimeMillis();
 
         // Print any errors that occurred
         if (errors.size() > 0) {
@@ -180,6 +233,8 @@ public class TextComparator {
         // Export to CSV
         CSVExporter.exportCSV("out.csv", placeholders, comparisons);
 
-        System.out.println("TF-IDF time: " + ((endTime - startTime) / 1000.0) + " seconds");
+        System.out.println("TF-IDF time: " + ((tfIdfEnd - tfIdfStart) / 1000.0) + " seconds");
+        System.out.println("Graph creation time: " + ((graphCalculationEnd - graphCalculationStart) / 1000.0) + " seconds");
+        System.out.println("Comparisons time: " + ((comparisonsEnd - comparisonsStart) / 1000.0) + " seconds");
     }
 }

@@ -57,26 +57,25 @@ public class GraphCache {
     /**
      * Calculate graphs for all methods and save them. Takes up a lot of memory...
      *
-     * @param te           TextEntities object for the text
      * @param placeholders Placeholders to use for methods that replace words with placeholders
      */
-    public void calculateGraphs(TextEntities te, List<String> placeholders) {
+    public void calculateGraphs(List<String> placeholders) {
         List<String> topTerms = null;
         if (Methods.isEnabled(Methods.PLACEHOLDER)) {
             // Get top terms for this text (only placeholder method uses top terms)
-            topTerms = getTopTerms(te);
+            topTerms = getTopTerms(text);
         }
 
         if (Methods.isEnabled(Methods.N_GRAMS)) {
             // N-gram graph for the normal text
             nGramNormalText = new DocumentNGramGraph();
-            nGramNormalText.setDataString(te.getText());
+            nGramNormalText.setDataString(text.getText());
         }
 
         if (Methods.isEnabled(Methods.WORD_GRAPHS)) {
             // Word graph for the normal text
             wordGraphNormalText = new DocumentWordGraph();
-            wordGraphNormalText.setDataString(te.getText());
+            wordGraphNormalText.setDataString(text.getText());
         }
 
         if (Methods.isEnabled(Methods.PLACEHOLDER) || Methods.isEnabled(Methods.PLACEHOLDER_SS)) {
@@ -89,9 +88,9 @@ public class GraphCache {
 
                     // If top terms exist, use method which uses them
                     if (topTerms != null && !topTerms.isEmpty()) {
-                        g.setDataString(te.getEntityTextWithPlaceholders(ph, topTerms));
+                        g.setDataString(text.getEntityTextWithPlaceholders(ph, topTerms));
                     } else {
-                        g.setDataString(te.getEntityTextWithPlaceholders(ph));
+                        g.setDataString(text.getEntityTextWithPlaceholders(ph));
                     }
 
                     wordGraphPH.put(ph, g);
@@ -100,7 +99,7 @@ public class GraphCache {
                 if (Methods.isEnabled(Methods.PLACEHOLDER_SS)) {
                     // Word graph for placeholder same size method
                     g = new DocumentWordGraph();
-                    g.setDataString(te.getEntityTextWithPlaceholderSameSize(ph));
+                    g.setDataString(text.getEntityTextWithPlaceholderSameSize(ph));
                     wordGraphPHSS.put(ph, g);
                 }
             }
@@ -109,7 +108,7 @@ public class GraphCache {
         if (Methods.isEnabled(Methods.RANDOM)) {
             // Word graph for random method
             wordGraphRand = new DocumentWordGraph();
-            wordGraphRand.setDataString(te.getEntityTextWithRandomWord());
+            wordGraphRand.setDataString(text.getEntityTextWithRandomWord());
         }
     }
 

@@ -1,5 +1,6 @@
 package utils.tf_idf;
 
+import entity_extractor.TextEntities;
 import org.javatuples.Pair;
 
 import java.io.BufferedReader;
@@ -64,12 +65,41 @@ public class DocumentParser {
                 termsDocsArray.add(tokenizedNormalizedTerms);
             }
         }
+
+        // Run tfIdf
+        tfIdfCalculator();
+    }
+
+    public void parseFiles(List<TextEntities> documents) {
+        for (TextEntities doc : documents) {
+            String text = doc.getText().toUpperCase();
+            String[] tokenizedTerms = text.replaceAll("[\\W&&[^\\s]]", " ").split("\\W+");   //to get individual terms
+
+            for (String term : tokenizedTerms) {
+                if (!allTerms.contains(term)) {  //avoid duplicate entry
+                    allTerms.add(term);
+                }
+            }
+
+            docNames.add(doc.getTitle());
+
+            int termsNum = tokenizedTerms.length;
+            String[] tokenizedNormalizedTerms = new String[termsNum];
+            for (int i = 0; i < termsNum; i++) {
+                tokenizedNormalizedTerms[i] = tokenizedTerms[i].toUpperCase();
+            }
+
+            termsDocsArray.add(tokenizedNormalizedTerms);
+        }
+
+        // Run tfIdf
+        tfIdfCalculator();
     }
 
     /**
      * Method to create termVector according to its tfidf score.
      */
-    public void tfIdfCalculator() {
+    private void tfIdfCalculator() {
         TFIDFCalculator calculator = new TFIDFCalculator();
         double tfidf;   //term frequency inverse document frequency
 
@@ -134,6 +164,9 @@ public class DocumentParser {
 
             // Reverse the list in order to make the top terms be first
             Collections.reverse(terms);
+
+            // Keep top 5% of words
+            terms = terms.subList(0, Math.round(terms.size() * 0.05f));
 
             return terms;
         }

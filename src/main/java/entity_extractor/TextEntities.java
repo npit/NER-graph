@@ -106,12 +106,6 @@ public class TextEntities {
      * @return Text with non-entity words replaced by the placeholder
      */
     public String getEntityTextWithPlaceholders(String placeholder, List<String> topTerms) {
-        // Keep top 5% of words
-        int termsToKeep = Math.round(topTerms.size() * 0.05f);
-
-        topTerms = topTerms.subList(0, termsToKeep);
-//        System.out.println("top terms: " + topTerms);
-
         // Create string that is the same number of words as original text but all words are the placeholder word
         int wordsNum = this.getNumberOfWordsInText();
         ArrayList<String> entityTextWords = new ArrayList<>(wordsNum);
@@ -120,15 +114,6 @@ public class TextEntities {
             entityTextWords.add(i, placeholder);
         }
 
-        // Replace words that should be entities with their entity names
-        for (ExtractedEntity e : entities) {
-            int index = getEntityIndex(e.getOffset());
-
-            entityTextWords.set(index, e.getHash());
-        }
-//        System.out.println("TEXT: " + text.replaceAll("\n", " "));
-//        System.out.println("before terms: " + getStringFromArrayList(entityTextWords));
-
         // Put top terms back in the text
         for (String term : topTerms) {
             List<Integer> indexes = getWordIndexes(term);
@@ -136,7 +121,14 @@ public class TextEntities {
                 entityTextWords.set(index, term);
             }
         }
-//        System.out.println("AFTER terms: " + getStringFromArrayList(entityTextWords));
+
+        // Replace words that should be entities with their entity names
+        for (ExtractedEntity e : entities) {
+            int index = getEntityIndex(e.getOffset());
+
+            entityTextWords.set(index, e.getHash());
+        }
+        //todo: check that entities are put in place correctly
 
         // Create string from the array list
         return getStringFromArrayList(entityTextWords);
