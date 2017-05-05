@@ -17,11 +17,11 @@ public class Methods {
 
     public Methods() {
         // Set methods that you want to use for text comparison here
-        methods.put(N_GRAMS, false);
-        methods.put(WORD_GRAPHS, false);
+        methods.put(N_GRAMS, true);
+        methods.put(WORD_GRAPHS, true);
         methods.put(PLACEHOLDER, true);
-        methods.put(PLACEHOLDER_SS, false);
-        methods.put(RANDOM, false);
+        methods.put(PLACEHOLDER_SS, true);
+        methods.put(RANDOM, true);
     }
 
     public static boolean isEnabled(int method) {

@@ -148,7 +148,6 @@ public class OpenCalaisExtractor implements EntityExtractor {
 
         // Extract the entities from the response, only if a method which uses them is enabled
         if (Methods.isEnabled(Methods.PLACEHOLDER) || Methods.isEnabled(Methods.PLACEHOLDER_SS) || Methods.isEnabled(Methods.RANDOM)) {
-            System.out.println("Getting entities");
             // Create blacklist with names of entities to ignore
             ArrayList<String> blacklist = new ArrayList<>();
             blacklist.add("DEV");
