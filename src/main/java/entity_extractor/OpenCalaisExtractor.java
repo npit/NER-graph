@@ -6,6 +6,7 @@ import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import utils.Methods;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -64,7 +65,7 @@ public class OpenCalaisExtractor implements EntityExtractor {
             } else {
                 LOGGER.log(Level.SEVERE, "File post failed: " + file);
                 LOGGER.log(Level.SEVERE, "Got code: " + returnCode);
-                LOGGER.log(Level.SEVERE, "response: "+method.getResponseBodyAsString());
+                LOGGER.log(Level.SEVERE, "response: " + method.getResponseBodyAsString());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -77,9 +78,10 @@ public class OpenCalaisExtractor implements EntityExtractor {
 
     /**
      * Save an OpenCalais response to a file and return it as a string
-     * @param file      File to save response for
-     * @param method    Post method
-     * @return          OpenCalais response string
+     *
+     * @param file   File to save response for
+     * @param method Post method
+     * @return OpenCalais response string
      */
     private String saveResponse(File file, PostMethod method) {
         PrintWriter writer = null;
@@ -98,7 +100,10 @@ public class OpenCalaisExtractor implements EntityExtractor {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (writer != null) try {writer.close();} catch (Exception ignored) {}
+            if (writer != null) try {
+                writer.close();
+            } catch (Exception ignored) {
+            }
         }
 
         return response;
@@ -111,8 +116,9 @@ public class OpenCalaisExtractor implements EntityExtractor {
 
     /**
      * Reads the specified file and returns it as a string
-     * @param file  File to read
-     * @return      String with file contents
+     *
+     * @param file File to read
+     * @return String with file contents
      */
     private String getCachedResponse(File file) {
         String response = "";
@@ -128,78 +134,83 @@ public class OpenCalaisExtractor implements EntityExtractor {
 
     /**
      * Parse the OpenCalais JSON response string into a ArrayList<ExtractedEntity> object
-     * @param responseStr    Response string
-     * @return              Text entities
+     *
+     * @param responseStr Response string
+     * @return Text entities
      */
     private TextEntities getEntitiesFromOpenCalaisResponse(String responseStr) {
         TextEntities entities = new TextEntities();
         JSONObject obj = new JSONObject(responseStr);
 
-        // Create blacklist with names of entities to ignore
-        ArrayList<String> blacklist = new ArrayList<>();
-        blacklist.add("DEV");
-        blacklist.add("http");
-        blacklist.add("html");
-
         // Get the document text from the response
         String text = obj.getJSONObject("doc").getJSONObject("info").getString("document");
         entities.setText(text);
 
-        // Get entities
-        Iterator<String> tags = obj.keys();
-        while(tags.hasNext()) {
-            String tagID = tags.next();
+        // Extract the entities from the response, only if a method which uses them is enabled
+        if (Methods.isEnabled(Methods.PLACEHOLDER) || Methods.isEnabled(Methods.PLACEHOLDER_SS) || Methods.isEnabled(Methods.RANDOM)) {
+            System.out.println("Getting entities");
+            // Create blacklist with names of entities to ignore
+            ArrayList<String> blacklist = new ArrayList<>();
+            blacklist.add("DEV");
+            blacklist.add("http");
+            blacklist.add("html");
 
-            if (tagID.equals("doc"))
-                continue;
+            // Get entities
+            Iterator<String> tags = obj.keys();
+            while (tags.hasNext()) {
+                String tagID = tags.next();
 
-            JSONObject tag = obj.getJSONObject(tagID);
+                if (tagID.equals("doc"))
+                    continue;
 
-            // Check that object has at least the basic properties that we need to continue
-            if (!tag.has("_typeGroup") || !tag.has("name") || !tag.has("_type") || !tag.has("instances")) {
-                continue;
-            }
+                JSONObject tag = obj.getJSONObject(tagID);
 
-            // If object is not of type "entities", ignore it as we only want entities
-            String typeGroup = tag.getString("_typeGroup");
-            if (!typeGroup.equals("entities"))
-                continue;
-
-            // Skip tags that are not for end user display
-//            if (tag.getString("forenduserdisplay").equals("false")) {
-//                continue;
-//            }
-
-            // Get all of this entity's instances
-            JSONArray instances = tag.getJSONArray("instances");
-
-            for (Object instance : instances) {
-                // Check that the object is indeed a JSONObject before casting it
-                if (!(instance instanceof JSONObject)) {
-                    LOGGER.log(Level.SEVERE, "Instance is not a JSONObject! Skipping it...");
+                // Check that object has at least the basic properties that we need to continue
+                if (!tag.has("_typeGroup") || !tag.has("name") || !tag.has("_type") || !tag.has("instances")) {
                     continue;
                 }
 
-                // Cast instance to a JSONObject to continue
-                JSONObject i = (JSONObject)instance;
-
-                if (!i.has("offset") || !i.has("length")) {
-                    LOGGER.log(Level.SEVERE, "Instance does not have offset or length! Skipping it...");
+                // If object is not of type "entities", ignore it as we only want entities
+                String typeGroup = tag.getString("_typeGroup");
+                if (!typeGroup.equals("entities"))
                     continue;
-                }
 
-                // Initialize entity for this instance and add the required properties to it
-                ExtractedEntity entity = new ExtractedEntity();
+                // Skip tags that are not for end user display
+//                if (tag.getString("forenduserdisplay").equals("false")) {
+//                    continue;
+//                }
 
-//                entity.setName(i.getString("exact"));
-                entity.setName(tag.getString("name"));
-                entity.setType(tag.getString("_type"));
-                entity.setOffset(i.getInt("offset"));
-                entity.setLength(i.getInt("length"));
+                // Get all of this entity's instances
+                JSONArray instances = tag.getJSONArray("instances");
 
-                // Only add entity if its name is not blacklisted
-                if (!blacklist.contains(entity.getName())) {
-                    entities.addEntity(entity);
+                for (Object instance : instances) {
+                    // Check that the object is indeed a JSONObject before casting it
+                    if (!(instance instanceof JSONObject)) {
+                        LOGGER.log(Level.SEVERE, "Instance is not a JSONObject! Skipping it...");
+                        continue;
+                    }
+
+                    // Cast instance to a JSONObject to continue
+                    JSONObject i = (JSONObject) instance;
+
+                    if (!i.has("offset") || !i.has("length")) {
+                        LOGGER.log(Level.SEVERE, "Instance does not have offset or length! Skipping it...");
+                        continue;
+                    }
+
+                    // Initialize entity for this instance and add the required properties to it
+                    ExtractedEntity entity = new ExtractedEntity();
+
+//                    entity.setName(i.getString("exact"));
+                    entity.setName(tag.getString("name"));
+                    entity.setType(tag.getString("_type"));
+                    entity.setOffset(i.getInt("offset"));
+                    entity.setLength(i.getInt("length"));
+
+                    // Only add entity if its name is not blacklisted
+                    if (!blacklist.contains(entity.getName())) {
+                        entities.addEntity(entity);
+                    }
                 }
             }
         }
@@ -221,7 +232,7 @@ public class OpenCalaisExtractor implements EntityExtractor {
             LOGGER.log(Level.FINE, "[OpenCalaisExtractor] Requesting entities from OpenCalais...");
 
             boolean responseOk = false;
-            while(!responseOk) {
+            while (!responseOk) {
                 response = postFile(input, createPostMethod());
 
                 if (response != null) {
@@ -231,7 +242,7 @@ public class OpenCalaisExtractor implements EntityExtractor {
                     // Sleep for a while in order to prevent OpenCalais error 429 (too many concurrent requests)
                     try {
                         Thread.sleep(sleepTime);
-                    } catch(InterruptedException e) {
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }

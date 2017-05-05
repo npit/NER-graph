@@ -4,6 +4,7 @@ import csv_export.ComparisonContainer;
 import csv_export.ComparisonResult;
 import gr.demokritos.iit.jinsect.documentModel.comparators.NGramCachedGraphComparator;
 import gr.demokritos.iit.jinsect.structs.GraphSimilarity;
+import utils.Methods;
 import utils.Percentage;
 
 import java.util.ArrayList;
@@ -88,8 +89,9 @@ public class ComparisonWorker implements Runnable {
 
     /**
      * Compare texts in various ways
-     * @param title1    Title of first text to compare
-     * @param title2    Title of second text to compare
+     *
+     * @param title1 Title of first text to compare
+     * @param title2 Title of second text to compare
      */
     private void compareTexts(String title1, String title2) {
         // Create comparator and graph similarity objects
@@ -100,34 +102,44 @@ public class ComparisonWorker implements Runnable {
         GraphCache text1Graphs = cacheMap.get(title1);
         GraphCache text2Graphs = cacheMap.get(title2);
 
-        // Compare normal texts with n-gram graphs
-        sim = comparator.getSimilarityBetween(text1Graphs.getnGramNormalText(), text2Graphs.getnGramNormalText());
-        myLog += "N-gram similarity:\t" + sim.toString() + "\n";
-        results.add(new ComparisonResult(sim.ValueSimilarity, sim.ContainmentSimilarity, sim.SizeSimilarity));
-
-        // Compare normal texts with word graphs
-        sim = comparator.getSimilarityBetween(text1Graphs.getWordGraphNormalText(), text2Graphs.getWordGraphNormalText());
-        myLog += "Word similarity:\t" + sim.toString() + "\n";
-        results.add(new ComparisonResult(sim.ValueSimilarity, sim.ContainmentSimilarity, sim.SizeSimilarity));
-
-        // Compare with named entity graph placeholder method
-        for (String ph : placeholders) {
-            sim = comparator.getSimilarityBetween(text1Graphs.getWordGraphPH(ph), text2Graphs.getWordGraphPH(ph));
-            myLog += "Placeholder (" + ph + "):\t" + sim.toString() + "\n";
+        if (Methods.isEnabled(Methods.N_GRAMS)) {
+            // Compare normal texts with n-gram graphs
+            sim = comparator.getSimilarityBetween(text1Graphs.getnGramNormalText(), text2Graphs.getnGramNormalText());
+            myLog += "N-gram similarity:\t" + sim.toString() + "\n";
             results.add(new ComparisonResult(sim.ValueSimilarity, sim.ContainmentSimilarity, sim.SizeSimilarity));
         }
 
-        // Compare with named entity graph placeholder same size method
-        for (String ph : placeholders) {
-            sim = comparator.getSimilarityBetween(text1Graphs.getWordGraphPHSS(ph), text2Graphs.getWordGraphPHSS(ph));
-            myLog += "PHSameSize (" + ph + "):\t\t" + sim.toString() + "\n";
+        if (Methods.isEnabled(Methods.WORD_GRAPHS)) {
+            // Compare normal texts with word graphs
+            sim = comparator.getSimilarityBetween(text1Graphs.getWordGraphNormalText(), text2Graphs.getWordGraphNormalText());
+            myLog += "Word similarity:\t" + sim.toString() + "\n";
             results.add(new ComparisonResult(sim.ValueSimilarity, sim.ContainmentSimilarity, sim.SizeSimilarity));
         }
 
-        // Compare with named entity graph random word method
-        sim = comparator.getSimilarityBetween(text1Graphs.getWordGraphRand(), text2Graphs.getWordGraphRand());
-        myLog += "Random words:\t\t" + sim.toString() + "\n";
-        results.add(new ComparisonResult(sim.ValueSimilarity, sim.ContainmentSimilarity, sim.SizeSimilarity));
+        if (Methods.isEnabled(Methods.PLACEHOLDER)) {
+            // Compare with named entity graph placeholder method
+            for (String ph : placeholders) {
+                sim = comparator.getSimilarityBetween(text1Graphs.getWordGraphPH(ph), text2Graphs.getWordGraphPH(ph));
+                myLog += "Placeholder (" + ph + "):\t" + sim.toString() + "\n";
+                results.add(new ComparisonResult(sim.ValueSimilarity, sim.ContainmentSimilarity, sim.SizeSimilarity));
+            }
+        }
+
+        if (Methods.isEnabled(Methods.PLACEHOLDER_SS)) {
+            // Compare with named entity graph placeholder same size method
+            for (String ph : placeholders) {
+                sim = comparator.getSimilarityBetween(text1Graphs.getWordGraphPHSS(ph), text2Graphs.getWordGraphPHSS(ph));
+                myLog += "PHSameSize (" + ph + "):\t\t" + sim.toString() + "\n";
+                results.add(new ComparisonResult(sim.ValueSimilarity, sim.ContainmentSimilarity, sim.SizeSimilarity));
+            }
+        }
+
+        if (Methods.isEnabled(Methods.RANDOM)) {
+            // Compare with named entity graph random word method
+            sim = comparator.getSimilarityBetween(text1Graphs.getWordGraphRand(), text2Graphs.getWordGraphRand());
+            myLog += "Random words:\t\t" + sim.toString() + "\n";
+            results.add(new ComparisonResult(sim.ValueSimilarity, sim.ContainmentSimilarity, sim.SizeSimilarity));
+        }
 
         // Add results to the saved results list
         comparisonResults.add(new ComparisonContainer(title1, title2, results));

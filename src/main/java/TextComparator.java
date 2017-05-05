@@ -1,6 +1,7 @@
 import csv_export.CSVExporter;
 import csv_export.ComparisonContainer;
 import entity_extractor.*;
+import utils.Methods;
 import utils.Percentage;
 import utils.VerySimpleFormatter;
 import utils.tf_idf.DocumentParser;
@@ -20,11 +21,19 @@ import java.util.logging.*;
  */
 public class TextComparator {
     private final static boolean cacheGraphs = true;    // Enable/disable caching of the graphs in memory for speed, but can use a lot of RAM
-    private final static boolean keepTopTerms = true;   // If true, will leave top terms (ranked by TF-IDF) in the text when making the graphs
+    private final boolean keepTopTerms;   // If true, will leave top terms (ranked by TF-IDF) in the text when making the graphs
 
     private final Logger LOGGER = Logger.getLogger("NamedEntityGraph");
 
+    public TextComparator() {
+        // Enable TF-IDF if placeholder method is enabled
+        this.keepTopTerms = Methods.isEnabled(Methods.PLACEHOLDER);
+    }
+
     public static void main(String[] args) {
+        // Initialize the static hashmap
+        new Methods();
+
         TextComparator neg = new TextComparator();
 
         try {
@@ -70,11 +79,14 @@ public class TextComparator {
                 LOGGER.log(Level.INFO, "Working on all files in " + input.getAbsolutePath());
 
                 // Calculate TF-IDF of documents, so we can keep top terms
+                long startTime = System.currentTimeMillis();
                 DocumentParser dp = new DocumentParser();
                 if (keepTopTerms) {
                     dp.parseFiles(input.getPath());
                     dp.tfIdfCalculator();
                 }
+                long endTime = System.currentTimeMillis();
+                System.out.println("TF-IDF time: " + ((endTime - startTime) / 1000.0) + " seconds");
 
                 // Get text entities and create graphs (if we should cache them)
                 LOGGER.log(Level.INFO, "TF-IDF Calculation complete, getting text entities...");
@@ -90,7 +102,7 @@ public class TextComparator {
                             // Log the progress so far
                             currPercent = Percentage.percent(i, totalFiles);
                             Level lvl = Level.FINE;
-                            if (currPercent - percentage > 1.0 || i == totalFiles) {
+                            if (currPercent - percentage > 10 || i == totalFiles) {
                                 lvl = Level.INFO;
                                 percentage = currPercent;
                             }

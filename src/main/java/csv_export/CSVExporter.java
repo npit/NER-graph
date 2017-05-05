@@ -1,5 +1,7 @@
 package csv_export;
 
+import utils.Methods;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +17,7 @@ public class CSVExporter {
         Logger LOGGER = Logger.getLogger("NamedEntityGraph");
         StringBuilder sb;
 
-        try{
+        try {
             PrintWriter writer = new PrintWriter(filename, "UTF-8");
 //            writer.println("sep=" + separator);
 
@@ -25,15 +27,26 @@ public class CSVExporter {
             List<String> comparisons = new ArrayList<>();
 
             // Gather names of comparisons that were made
-            comparisons.add("n-gram graph");
-            comparisons.add("word graph");
-            for (String ph : placeholders) {
-                comparisons.add("PH (" + ph + ")");
+            if (Methods.isEnabled(Methods.N_GRAMS))
+                comparisons.add("n-gram graph");
+
+            if (Methods.isEnabled(Methods.WORD_GRAPHS))
+                comparisons.add("word graph");
+
+            if (Methods.isEnabled(Methods.PLACEHOLDER)) {
+                for (String ph : placeholders) {
+                    comparisons.add("PH (" + ph + ")");
+                }
             }
-            for (String ph : placeholders) {
-                comparisons.add("PHSS (" + ph + ")");
+
+            if (Methods.isEnabled(Methods.PLACEHOLDER_SS)) {
+                for (String ph : placeholders) {
+                    comparisons.add("PHSS (" + ph + ")");
+                }
             }
-            comparisons.add("rand");
+
+            if (Methods.isEnabled(Methods.RANDOM))
+                comparisons.add("rand");
 
             // Create headers with graph similarity measures for each comparison
             sb = new StringBuilder();
