@@ -42,11 +42,12 @@ public class DocumentParser {
                     sb.append(s);
                     sb.append(" ");
                 }
-                String[] tokenizedTerms = sb.toString().replaceAll("[\\W&&[^\\s]]", " ").split("\\W+");   //to get individual terms
-                for (String term : tokenizedTerms) {
-                    // Make term always uppercase, to further prevent duplicates
-                    term = term.toUpperCase();
 
+                // Get text, make it upper case and split into terms
+                String text = sb.toString().toUpperCase();
+                String[] tokenizedTerms = text.replaceAll("[\\W&&[^\\s]]", " ").split("\\W+");   //to get individual terms
+
+                for (String term : tokenizedTerms) {
                     if (!allTerms.contains(term)) {  //avoid duplicate entry
                         allTerms.add(term);
                     }

@@ -34,6 +34,7 @@ public class TextComparator {
         // Initialize the static hashmap
         new Methods();
 
+        long totalTimeStart = System.currentTimeMillis();
         TextComparator neg = new TextComparator();
 
         try {
@@ -41,6 +42,9 @@ public class TextComparator {
         } catch (IOException e) {
             System.err.println("Problem writing log file");
         }
+
+        long totalTimeEnd = System.currentTimeMillis();
+        System.out.println("Total time: " + ((totalTimeEnd - totalTimeStart) / 1000.0) + " seconds");
     }
 
     private void start() throws IOException {
@@ -68,6 +72,8 @@ public class TextComparator {
 //        placeholders.add("-");
         placeholders.add("A");
 
+        long startTime = 0;
+        long endTime = 0;
         File input = new File(inputFolder);
         EntityExtractor entityExtractor = new OpenCalaisExtractor();
         ArrayList<TextEntities> texts = new ArrayList<>();
@@ -79,14 +85,13 @@ public class TextComparator {
                 LOGGER.log(Level.INFO, "Working on all files in " + input.getAbsolutePath());
 
                 // Calculate TF-IDF of documents, so we can keep top terms
-                long startTime = System.currentTimeMillis();
+                startTime = System.currentTimeMillis();
                 DocumentParser dp = new DocumentParser();
                 if (keepTopTerms) {
                     dp.parseFiles(input.getPath());
                     dp.tfIdfCalculator();
                 }
-                long endTime = System.currentTimeMillis();
-                System.out.println("TF-IDF time: " + ((endTime - startTime) / 1000.0) + " seconds");
+                endTime = System.currentTimeMillis();
 
                 // Get text entities and create graphs (if we should cache them)
                 LOGGER.log(Level.INFO, "TF-IDF Calculation complete, getting text entities...");
@@ -174,5 +179,7 @@ public class TextComparator {
 
         // Export to CSV
         CSVExporter.exportCSV("out.csv", placeholders, comparisons);
+
+        System.out.println("TF-IDF time: " + ((endTime - startTime) / 1000.0) + " seconds");
     }
 }
