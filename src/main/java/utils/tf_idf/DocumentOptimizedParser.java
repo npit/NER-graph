@@ -52,10 +52,8 @@ public class DocumentOptimizedParser extends DocumentParser {
 //                double dTFIDF = dTf * dIdf;
                 double dTFIDF = hCurDocTF.get(sTerm) * -Math.log10(dTermsInDocs.getValue(sTerm) / documents.size());
 
-                if (dTFIDF > 0.0) {
-                    // Update doc struct
-                    dTopTerms.setValue(sTerm, dTFIDF);
-                }
+                // Update doc struct
+                dTopTerms.setValue(sTerm, dTFIDF);
             }
 
             // Save top terms
