@@ -27,9 +27,6 @@ public class DocumentOptimizedParser extends DocumentParser {
             String[] saTerms = t.getText().toUpperCase().replaceAll("[\\W&&[^\\s]]", " ").split("\\W+");
             // For each term
             for (String sTerm : saTerms) {
-                if (sTerm.trim().length() == 0)
-                    continue; // Ignore empty strings
-
                 // Update the corresponding local entries (TF)
                 dTerms.increaseValue(sTerm, 1.0);
             }
@@ -50,19 +47,23 @@ public class DocumentOptimizedParser extends DocumentParser {
             // For every term
             for (String sTerm : hCurDocTF.keySet()) {
                 // Calculate TF-IDF
+//                double dTf = hCurDocTF.get(sTerm) / hCurDocTF.values().stream().mapToDouble(Double::doubleValue).sum();
+//                double dIdf = Math.log(documents.size() / dTermsInDocs.getValue(sTerm));
+//                double dTFIDF = dTf * dIdf;
                 double dTFIDF = hCurDocTF.get(sTerm) * -Math.log10(dTermsInDocs.getValue(sTerm) / documents.size());
-                // Update doc struct
-                dTopTerms.setValue(sTerm, dTFIDF);
+
+                if (dTFIDF > 0.0) {
+                    // Update doc struct
+                    dTopTerms.setValue(sTerm, dTFIDF);
+                }
             }
 
             // Save top terms
             List<Pair<String, Double>> lTmp = new ArrayList<>();
-            int iNumOfTerms = dTopTerms.asTreeMap().size();
+            int iTermsToKeep = Math.round(dTopTerms.asTreeMap().size() * 0.05f);
 
             // Keep adding top items until we reach a number we want
-            int termsToKeep = Math.round(iNumOfTerms * 0.05f);
-            while (lTmp.size() < termsToKeep) {
-//            while (lTmp.size() <= (double) iNumOfTerms * 0.05) {
+            while (lTmp.size() < iTermsToKeep) {
                 String sTopTerm = dTopTerms.getKeyOfMaxValue();
                 lTmp.add(new Pair<>(sTopTerm, dTopTerms.getValue(sTopTerm)));
                 // Remove from list of candidates
