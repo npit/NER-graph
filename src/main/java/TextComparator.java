@@ -132,53 +132,6 @@ public class TextComparator {
         }
         long tfIdfEnd = System.currentTimeMillis();
 
-//        DocumentParser old = new DocumentParser();
-//        old.parseFiles(texts);
-//        Map<String, List<Pair<String, Double>>> oldMap = new HashMap<>();
-//        for (TextEntities text : texts) {
-//            oldMap.put(text.getTitle(), old.getSortedDocumentTerms(text.getTitle()));
-//        }
-//        System.err.println("NOT OPTIMIZED:\n" + utils.printIterable(oldMap.entrySet(), "\n") + "\n\n");
-//
-//        for (String text : oldMap.keySet()) {
-//            // Get optimized one
-//            List<Pair<String, Double>> opt = dp.getSortedDocumentTerms(text);
-//            List<Pair<String, Double>> nonOpt = oldMap.get(text);
-//
-//            if (opt.size() != nonOpt.size()) {
-//                System.out.println("File " + text + " has different sizes! " + opt.size() + " vs " + nonOpt.size());
-//            } else {
-//                for (int i = 0; i < opt.size(); i++) {
-//                    if (!opt.get(i).getValue0().equals(nonOpt.get(i).getValue0())) {
-//                        // Check without caring about order
-//                        Set<String> oldSet = new HashSet<>();
-//                        for (Pair<String, Double> p : nonOpt) {
-//                            oldSet.add(p.getValue0());
-//                        }
-//                        Set<String> newSet = new HashSet<>();
-//                        for (Pair<String, Double> p : opt) {
-//                            newSet.add(p.getValue0());
-//                        }
-//
-//                        if (!oldSet.equals(newSet)) {
-//                            List<String> oldList = new ArrayList<>();
-//                            oldList.addAll(oldSet);
-//                            List<String> newList = new ArrayList<>();
-//                            newList.addAll(newSet);
-//
-//                            Collections.sort(oldList);
-//                            Collections.sort(newList);
-//
-//                            System.out.println("DIFFERENT VALUE (" + text + ")");
-//                            System.out.println("\t(old)=> " + oldList);
-//                            System.out.println("\t(new)=> " + newList);
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
         // Calculate graphs in advance
         LOGGER.log(Level.INFO, "Calculating graphs...");
         long graphCalculationStart = System.currentTimeMillis();
