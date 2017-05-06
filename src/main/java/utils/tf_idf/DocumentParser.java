@@ -18,7 +18,6 @@ import java.util.List;
  * @author Mubin Shrestha
  */
 public class DocumentParser {
-
     //This variable will hold all terms of each document in an array.
     private List<String> docNames = new ArrayList<>();
     private List<String[]> termsDocsArray = new ArrayList<>();
@@ -83,13 +82,7 @@ public class DocumentParser {
 
             docNames.add(doc.getTitle());
 
-            int termsNum = tokenizedTerms.length;
-            String[] tokenizedNormalizedTerms = new String[termsNum];
-            for (int i = 0; i < termsNum; i++) {
-                tokenizedNormalizedTerms[i] = tokenizedTerms[i].toUpperCase();
-            }
-
-            termsDocsArray.add(tokenizedNormalizedTerms);
+            termsDocsArray.add(tokenizedTerms);
         }
 
         // Run tfIdf
@@ -148,11 +141,9 @@ public class DocumentParser {
                 String term = allTerms.get(i);
                 double termRank = tfIdfVector[i];
 
-                terms.add(new Pair<>(term, termRank));
+                if (termRank > 0)
+                    terms.add(new Pair<>(term, termRank));
             }
-
-            // Remove words with 0 rank value
-            terms.removeIf(obj -> obj.getValue1().equals(0.0));
 
             // Sort the list with comparator which compares the doubles
             terms.sort((o1, o2) -> {
