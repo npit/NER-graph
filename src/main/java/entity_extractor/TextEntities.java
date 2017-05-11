@@ -34,7 +34,10 @@ public class TextEntities {
     }
 
     public void setText(String text) {
-        this.text = text;
+        this.text = text
+                .replace("\n", " ")
+                .replace("\t", " ")
+                .replaceAll("[\\W&&[^\\s]]", " ");
     }
 
     public String getTitle() {
@@ -128,7 +131,6 @@ public class TextEntities {
 
             entityTextWords.set(index, e.getHash());
         }
-        //todo: check that entities are put in place correctly
 
         // Create string from the array list
         return getStringFromArrayList(entityTextWords);
@@ -196,7 +198,6 @@ public class TextEntities {
         StringTokenizer st = new StringTokenizer(this.text, wordSeparator);
         ArrayList<String> words = new ArrayList<>(numOfWords);
 
-
         int tokenIndex = 0;
         while (st.hasMoreTokens()) {
             words.add(tokenIndex++, st.nextToken());
@@ -238,13 +239,12 @@ public class TextEntities {
     }
 
     private List<Integer> getWordIndexes(String word) {
-        StringTokenizer st = new StringTokenizer(text, wordSeparator);
+        StringTokenizer st = new StringTokenizer(text.toUpperCase(), wordSeparator);
         List<Integer> indexes = new ArrayList<>();
 
         int index = 0;
         while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            if (token.toUpperCase().equals(word)) {
+            if (st.nextToken().equals(word)) {
                 indexes.add(index);
             }
 
