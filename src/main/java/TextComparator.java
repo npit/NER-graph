@@ -130,30 +130,35 @@ public class TextComparator {
         if (keepTopTerms) {
             dp.parseFiles(texts);
         }
-        long tfIdfEnd = System.currentTimeMillis();
 
         // For Cosine Similarity, create text distrubutions containing all terms
-        Map<String, Distribution<String>> fullDistributions = null;
+        Map<String, double[]> fullDistributions = null;
         if (Methods.isEnabled(Methods.COSINE)) {
             Set<String> allTerms = dp.getAllTerms();
+            ArrayList<String> allTermsList = new ArrayList<>();
+            allTermsList.addAll(allTerms);
             fullDistributions = new HashMap<>();
 
             for (TextEntities text : texts) {
-                Distribution<String> fullTextDistrib = new Distribution<>();
+                double[] fullTextDistrib = new double[allTermsList.size()];
                 Distribution<String> textDistrib = dp.getDistributionOfDocument(text.getTitle());
 
+                int count = 0;
                 for (String term : allTerms) {
                     // If the text contains this term use its value, else set it to 0
                     if (textDistrib.asTreeMap().containsKey(term)) {
-                        fullTextDistrib.setValue(term, textDistrib.getValue(term));
+                        fullTextDistrib[count] = textDistrib.getValue(term);
                     } else {
-                        fullTextDistrib.setValue(term, 0);
+                        fullTextDistrib[count] = 0.0;
                     }
+
+                    count++;
                 }
 
                 fullDistributions.put(text.getTitle(), fullTextDistrib);
             }
         }
+        long tfIdfEnd = System.currentTimeMillis();
 
         // Calculate graphs in advance
         LOGGER.log(Level.INFO, "Calculating graphs...");

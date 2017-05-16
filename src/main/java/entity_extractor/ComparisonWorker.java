@@ -2,12 +2,11 @@ package entity_extractor;
 
 import csv_export.ComparisonContainer;
 import csv_export.ComparisonResult;
-import gr.demokritos.iit.conceptualIndex.structs.Distribution;
 import gr.demokritos.iit.jinsect.documentModel.comparators.NGramCachedGraphComparator;
 import gr.demokritos.iit.jinsect.structs.GraphSimilarity;
 import utils.Methods;
 import utils.Percentage;
-import utils.tf_idf.CosineSimilarityOptimized;
+import utils.tf_idf.CosineSimilarity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +26,13 @@ public class ComparisonWorker implements Runnable {
     private final Map<String, GraphCache> cacheMap;
     private final List<ComparisonContainer> allResults;
     private final List<ComparisonContainer> comparisonResults;
-    private final Map<String, Distribution<String>> textTerms;
+    private final Map<String, double[]> textTerms;
     private String myLog;
-    private CosineSimilarityOptimized cs;
+    private CosineSimilarity cs;
 
     public ComparisonWorker(int id, int cores, int textsLen, ArrayList<String> placeholders, ArrayList<String> errors,
                             ArrayList<TextEntities> texts, Map<String, GraphCache> cacheMap,
-                            List<ComparisonContainer> allResults, Map<String, Distribution<String>> textTerms) {
+                            List<ComparisonContainer> allResults, Map<String, double[]> textTerms) {
         this.id = id;
         this.cores = cores;
         this.textsLen = textsLen;
@@ -45,7 +44,7 @@ public class ComparisonWorker implements Runnable {
         this.textTerms = textTerms;
 
         if (Methods.isEnabled(Methods.COSINE)) {
-            cs = new CosineSimilarityOptimized();
+            cs = new CosineSimilarity();
         }
 
         this.comparisonResults = new ArrayList<>();
