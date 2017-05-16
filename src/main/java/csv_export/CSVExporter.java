@@ -48,6 +48,9 @@ public class CSVExporter {
             if (Methods.isEnabled(Methods.RANDOM))
                 comparisons.add("rand");
 
+            if (Methods.isEnabled(Methods.COSINE))
+                comparisons.add("cosine");
+
             // Create headers with graph similarity measures for each comparison
             sb = new StringBuilder();
 

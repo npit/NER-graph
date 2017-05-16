@@ -1,11 +1,11 @@
 import csv_export.CSVExporter;
 import csv_export.ComparisonContainer;
 import entity_extractor.*;
+import gr.demokritos.iit.conceptualIndex.structs.Distribution;
 import utils.Methods;
 import utils.Percentage;
 import utils.VerySimpleFormatter;
 import utils.tf_idf.DocumentOptimizedParser;
-import utils.tf_idf.DocumentParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +27,8 @@ public class TextComparator {
     private final Logger LOGGER = Logger.getLogger("NamedEntityGraph");
 
     public TextComparator() {
-        // Enable TF-IDF if placeholder method is enabled
-        this.keepTopTerms = Methods.isEnabled(Methods.PLACEHOLDER);
+        // Enable TF-IDF if placeholder method or Cosine Similarity is enabled
+        this.keepTopTerms = Methods.isEnabled(Methods.PLACEHOLDER) || Methods.isEnabled(Methods.COSINE);
     }
 
     public static void main(String[] args) {
@@ -126,11 +126,34 @@ public class TextComparator {
         // Calculate TF-IDF of documents, so we can keep top terms
         LOGGER.log(Level.INFO, "Calculating TF-IDF...");
         long tfIdfStart = System.currentTimeMillis();
-        DocumentParser dp = new DocumentOptimizedParser();
+        DocumentOptimizedParser dp = new DocumentOptimizedParser();
         if (keepTopTerms) {
             dp.parseFiles(texts);
         }
         long tfIdfEnd = System.currentTimeMillis();
+
+        // For Cosine Similarity, create text distrubutions containing all terms
+        Map<String, Distribution<String>> fullDistributions = null;
+        if (Methods.isEnabled(Methods.COSINE)) {
+            Set<String> allTerms = dp.getAllTerms();
+            fullDistributions = new HashMap<>();
+
+            for (TextEntities text : texts) {
+                Distribution<String> fullTextDistrib = new Distribution<>();
+                Distribution<String> textDistrib = dp.getDistributionOfDocument(text.getTitle());
+
+                for (String term : allTerms) {
+                    // If the text contains this term use its value, else set it to 0
+                    if (textDistrib.asTreeMap().containsKey(term)) {
+                        fullTextDistrib.setValue(term, textDistrib.getValue(term));
+                    } else {
+                        fullTextDistrib.setValue(term, 0);
+                    }
+                }
+
+                fullDistributions.put(text.getTitle(), fullTextDistrib);
+            }
+        }
 
         // Calculate graphs in advance
         LOGGER.log(Level.INFO, "Calculating graphs...");
@@ -140,7 +163,6 @@ public class TextComparator {
                 GraphCache cache = new GraphCache(entities, dp);
                 cache.calculateGraphs(placeholders);
                 graphs.put(entities.getTitle(), cache);
-
             }
         }
         long graphCalculationEnd = System.currentTimeMillis();
@@ -160,7 +182,7 @@ public class TextComparator {
 
         // Start a thread for each CPU core
         for (int i = 0; i < cores; i++) {
-            ComparisonWorker r = new ComparisonWorker(i, cores, textsLen, placeholders, errors, texts, graphs, comparisons);
+            ComparisonWorker r = new ComparisonWorker(i, cores, textsLen, placeholders, errors, texts, graphs, comparisons, fullDistributions);
             executor.execute(r);
         }
 

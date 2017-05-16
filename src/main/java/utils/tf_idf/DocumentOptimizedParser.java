@@ -4,18 +4,16 @@ import entity_extractor.TextEntities;
 import gr.demokritos.iit.conceptualIndex.structs.Distribution;
 import org.javatuples.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DocumentOptimizedParser extends DocumentParser {
     Map<String, List<Pair<String, Double>>> mTopTermsPerDocument = new HashMap<>();
+    HashMap<String, Distribution<String>> hTFsPerDoc;
 
     @Override
     public void parseFiles(List<TextEntities> documents) {
         // Init overall TF struct
-        HashMap<String, Distribution<String>> hTFsPerDoc = new HashMap<>();
+        hTFsPerDoc = new HashMap<>();
 
         // Init terms histogram overall (IDF)
         Distribution<String> dTermsInDocs = new Distribution<>();
@@ -79,5 +77,26 @@ public class DocumentOptimizedParser extends DocumentParser {
     @Override
     public List<Pair<String, Double>> getSortedDocumentTerms(String docName) {
         return mTopTermsPerDocument.get(docName);
+    }
+
+    /**
+     * Get all terms found in the dataset (if called before parseFiles, will return empty Set)
+     *
+     * @return Set of all terms
+     */
+    public Set<String> getAllTerms() {
+        Set<String> allTerms = new HashSet<>();
+
+        for (List<Pair<String, Double>> l : mTopTermsPerDocument.values()) {
+            for (Pair<String, Double> p : l) {
+                allTerms.add(p.getValue0());
+            }
+        }
+
+        return allTerms;
+    }
+
+    public Distribution<String> getDistributionOfDocument(String docName) {
+        return hTFsPerDoc.get(docName);
     }
 }

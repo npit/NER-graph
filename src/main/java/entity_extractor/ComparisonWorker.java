@@ -2,10 +2,12 @@ package entity_extractor;
 
 import csv_export.ComparisonContainer;
 import csv_export.ComparisonResult;
+import gr.demokritos.iit.conceptualIndex.structs.Distribution;
 import gr.demokritos.iit.jinsect.documentModel.comparators.NGramCachedGraphComparator;
 import gr.demokritos.iit.jinsect.structs.GraphSimilarity;
 import utils.Methods;
 import utils.Percentage;
+import utils.tf_idf.CosineSimilarityOptimized;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +27,13 @@ public class ComparisonWorker implements Runnable {
     private final Map<String, GraphCache> cacheMap;
     private final List<ComparisonContainer> allResults;
     private final List<ComparisonContainer> comparisonResults;
+    private final Map<String, Distribution<String>> textTerms;
     private String myLog;
+    private CosineSimilarityOptimized cs;
 
     public ComparisonWorker(int id, int cores, int textsLen, ArrayList<String> placeholders, ArrayList<String> errors,
                             ArrayList<TextEntities> texts, Map<String, GraphCache> cacheMap,
-                            List<ComparisonContainer> allResults) {
+                            List<ComparisonContainer> allResults, Map<String, Distribution<String>> textTerms) {
         this.id = id;
         this.cores = cores;
         this.textsLen = textsLen;
@@ -38,6 +42,11 @@ public class ComparisonWorker implements Runnable {
         this.texts = texts;
         this.cacheMap = cacheMap;
         this.allResults = allResults;
+        this.textTerms = textTerms;
+
+        if (Methods.isEnabled(Methods.COSINE)) {
+            cs = new CosineSimilarityOptimized();
+        }
 
         this.comparisonResults = new ArrayList<>();
     }
@@ -61,12 +70,10 @@ public class ComparisonWorker implements Runnable {
         for (Integer i : compGroups) {
             // Do the comparisons for this i
             for (int j = i + 1; j < textsLen; j++) {
-                myLog = "";
-
                 TextEntities text1 = texts.get(i);
                 TextEntities text2 = texts.get(j);
 
-                myLog += "Comparing " + text1.getTitle() + " with " + text2.getTitle() + "\n";
+                myLog = "Comparing " + text1.getTitle() + " with " + text2.getTitle() + "\n";
 
                 try {
                     compareTexts(text1.getTitle(), text2.getTitle());
@@ -139,6 +146,12 @@ public class ComparisonWorker implements Runnable {
             sim = comparator.getSimilarityBetween(text1Graphs.getWordGraphRand(), text2Graphs.getWordGraphRand());
             myLog += "Random words:\t\t" + sim.toString() + "\n";
             results.add(new ComparisonResult(sim.ValueSimilarity, sim.ContainmentSimilarity, sim.SizeSimilarity));
+        }
+
+        if (Methods.isEnabled(Methods.COSINE)) {
+            // Compare with Cosine Similarity
+            double cosineSim = cs.cosineSimilarity(textTerms.get(title1), textTerms.get(title2));
+            results.add(new ComparisonResult(cosineSim, 0, 0));
         }
 
         // Add results to the saved results list

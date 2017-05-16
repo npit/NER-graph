@@ -14,6 +14,7 @@ public class Methods {
     public final static int PLACEHOLDER = 2;
     public final static int PLACEHOLDER_SS = 3;
     public final static int RANDOM = 4;
+    public final static int COSINE = 5;
 
     public Methods() {
         // Set methods that you want to use for text comparison here
@@ -22,6 +23,7 @@ public class Methods {
         methods.put(PLACEHOLDER, true);
         methods.put(PLACEHOLDER_SS, true);
         methods.put(RANDOM, true);
+        methods.put(COSINE, true);
     }
 
     public static boolean isEnabled(int method) {
