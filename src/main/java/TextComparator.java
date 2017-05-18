@@ -28,13 +28,10 @@ public class TextComparator {
 
     public TextComparator() {
         // Enable TF-IDF if placeholder method or Cosine Similarity is enabled
-        this.keepTopTerms = Methods.isEnabled(Methods.PLACEHOLDER) || Methods.isEnabled(Methods.COSINE);
+        this.keepTopTerms = Methods.isEnabled(Methods.PLACEHOLDER) || Methods.isEnabled(Methods.COSINE) || Methods.isEnabled(Methods.PLACEHOLDER_EXTRA_WEIGHT);
     }
 
     public static void main(String[] args) {
-        // Initialize the static hashmap
-        new Methods();
-
         long totalTimeStart = System.currentTimeMillis();
         TextComparator neg = new TextComparator();
 

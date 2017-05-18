@@ -2,20 +2,21 @@ package entity_extractor;
 
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
 import gr.demokritos.iit.jinsect.documentModel.representations.DocumentWordGraph;
+import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 import org.javatuples.Pair;
+import salvo.jesus.graph.Edge;
+import salvo.jesus.graph.WeightedEdgeImpl;
 import utils.Methods;
 import utils.tf_idf.DocumentParser;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings("WeakerAccess")
 public class GraphCache {
     private DocumentNGramGraph nGramNormalText;
     private DocumentWordGraph wordGraphNormalText;
     private Map<String, DocumentWordGraph> wordGraphPH;
+    private Map<String, DocumentWordGraph> wordGraphPHEW;   // Placeholder w/ extra weight for edges that touch entities
     private Map<String, DocumentWordGraph> wordGraphPHSS;
     private DocumentWordGraph wordGraphRand;
 
@@ -25,6 +26,7 @@ public class GraphCache {
     public GraphCache(TextEntities text, DocumentParser dp) {
         this.wordGraphPH = new HashMap<>();
         this.wordGraphPHSS = new HashMap<>();
+        this.wordGraphPHEW = new HashMap<>();
         this.nGramNormalText = null;
         this.wordGraphNormalText = null;
         this.wordGraphRand = null;
@@ -78,7 +80,7 @@ public class GraphCache {
             wordGraphNormalText.setDataString(text.getText());
         }
 
-        if (Methods.isEnabled(Methods.PLACEHOLDER) || Methods.isEnabled(Methods.PLACEHOLDER_SS)) {
+        if (Methods.isEnabled(Methods.PLACEHOLDER) || Methods.isEnabled(Methods.PLACEHOLDER_SS) || Methods.isEnabled(Methods.PLACEHOLDER_EXTRA_WEIGHT)) {
             for (String ph : placeholders) {
                 DocumentWordGraph g;
 
@@ -96,6 +98,14 @@ public class GraphCache {
                     wordGraphPH.put(ph, g);
                 }
 
+                if (Methods.isEnabled(Methods.PLACEHOLDER_EXTRA_WEIGHT)) {
+                    // Word graph for placeholder extra weight method
+                    g = new DocumentWordGraph();
+                    createPlaceholderExtraWeightGraph(g, ph, topTerms);
+
+                    wordGraphPHEW.put(ph, g);
+                }
+
                 if (Methods.isEnabled(Methods.PLACEHOLDER_SS)) {
                     // Word graph for placeholder same size method
                     g = new DocumentWordGraph();
@@ -109,6 +119,51 @@ public class GraphCache {
             // Word graph for random method
             wordGraphRand = new DocumentWordGraph();
             wordGraphRand.setDataString(text.getEntityTextWithRandomWord());
+        }
+    }
+
+    /**
+     * Create the graph for the Placeholder Extra Weight method
+     *
+     * @param g        Graph to initialize
+     * @param ph       Placeholder word
+     * @param topTerms Top terms list
+     */
+    private void createPlaceholderExtraWeightGraph(DocumentWordGraph g, String ph, List<String> topTerms) {
+        // If top terms exist, use method which uses them
+        if (topTerms != null && !topTerms.isEmpty()) {
+            // Add the text to the graph
+            g.setDataString(text.getEntityTextWithPlaceholders(ph, topTerms));
+
+            // Edit the graph to make edges that touch entities weigh double
+            UniqueVertexGraph graphLevel = g.getGraphLevel(0);
+
+            // Create list of this text's entity hash codes
+            List<String> entities = new ArrayList<>();
+            for (ExtractedEntity ent : text.getEntities()) {
+                String hash = ent.hashCode() + "";
+                if (hash.startsWith("-")) {
+                    // Remove - from start of entity hashcode because on word graphs it is removed already
+                    hash = hash.substring(1, hash.length());
+                }
+
+                entities.add(hash);
+            }
+
+            // For all of the graph's edges
+            Set<Edge> edgeSet = graphLevel.getEdgeSet();
+            for (Edge e : edgeSet) {
+                // Check if this edge contains any entities
+                if ((entities.contains(e.getVertexA().getLabel()) || entities.contains(e.getVertexB().getLabel())) && e instanceof WeightedEdgeImpl) {
+                    // Double the weight of this edge because it touches an entity
+                    WeightedEdgeImpl wEdge = (WeightedEdgeImpl) e;
+                    wEdge.setWeight(wEdge.getWeight() * 2);
+                }
+            }
+        } else {
+            // There is no point running this method without TF-IDF as all weights will be increased,
+            // so just run the normal Placeholder instead...
+            g.setDataString(text.getEntityTextWithPlaceholders(ph));
         }
     }
 
@@ -182,6 +237,23 @@ public class GraphCache {
         if (g == null) {
             g = new DocumentWordGraph();
             g.setDataString(text.getEntityTextWithPlaceholderSameSize(placeholder));
+        }
+
+        return g;
+    }
+
+    /**
+     * Return a word graph of the placeholder extra weight method text. If it does not exist, create it and return it
+     *
+     * @param placeholder Placeholder to use in text
+     * @return Word graph
+     */
+    public DocumentWordGraph getWordGraphPHEW(String placeholder) {
+        DocumentWordGraph g = wordGraphPHEW.get(placeholder);
+
+        if (g == null) {
+            g = new DocumentWordGraph();
+            createPlaceholderExtraWeightGraph(g, placeholder, getTopTerms(text));
         }
 
         return g;

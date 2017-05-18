@@ -153,6 +153,15 @@ public class ComparisonWorker implements Runnable {
             results.add(new ComparisonResult(cosineSim, 0, 0));
         }
 
+        if (Methods.isEnabled(Methods.PLACEHOLDER_EXTRA_WEIGHT)) {
+            // Compare with named entity graph placeholder extra weight method
+            for (String ph : placeholders) {
+                sim = comparator.getSimilarityBetween(text1Graphs.getWordGraphPHEW(ph), text2Graphs.getWordGraphPHEW(ph));
+                myLog += "PH Extra Weight (" + ph + "):\t" + sim.toString() + "\n";
+                results.add(new ComparisonResult(sim.ValueSimilarity, sim.ContainmentSimilarity, sim.SizeSimilarity));
+            }
+        }
+
         // Add results to the saved results list
         comparisonResults.add(new ComparisonContainer(title1, title2, results));
     }

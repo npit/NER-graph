@@ -51,6 +51,12 @@ public class CSVExporter {
             if (Methods.isEnabled(Methods.COSINE))
                 comparisons.add("cosine");
 
+            if (Methods.isEnabled(Methods.PLACEHOLDER_EXTRA_WEIGHT)) {
+                for (String ph : placeholders) {
+                    comparisons.add("PHEW (" + ph + ")");
+                }
+            }
+
             // Create headers with graph similarity measures for each comparison
             sb = new StringBuilder();
 
