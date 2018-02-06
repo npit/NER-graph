@@ -27,7 +27,7 @@ target/
 *.swp
 *.DS_Store
 *.lock
-*.sh
+
 .directory
 
 
