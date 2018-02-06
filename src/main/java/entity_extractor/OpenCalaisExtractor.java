@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 public class OpenCalaisExtractor implements EntityExtractor {
     private static final String CALAIS_URL = "https://api.thomsonreuters.com/permid/calais";
 
-    private static final String outputFolder = "texts/output";
     private static final boolean enableCache = true;
     private static final int sleepTime = 500;
 
@@ -35,10 +34,22 @@ public class OpenCalaisExtractor implements EntityExtractor {
 
         // Setup api keys
         apiKeys = new ArrayList<>();
-        apiKeys.add("YOUR_OPENCALAIS_API_KEY");
+        apiKeys.add("api-key");
 
         // Setup cache/output folder
-        this.output = new File(outputFolder);
+        this.output = new File(".");
+    }
+    public OpenCalaisExtractor(String output_folder, String key) {
+        // Setup client
+        this.client = new HttpClient();
+        this.client.getParams().setParameter("http.useragent", "Calais Rest Client");
+
+        // Setup api keys
+        apiKeys = new ArrayList<>();
+        apiKeys.add(key.trim());
+
+        // Setup cache/output folder
+        this.output = new File(output_folder);
     }
 
     private PostMethod createPostMethod() {
@@ -235,7 +246,7 @@ public class OpenCalaisExtractor implements EntityExtractor {
             while (!responseOk) {
                 response = postFile(input, createPostMethod());
 
-                if (response != null) {
+                if (response != null && !response.isEmpty()) {
                     // Exit loop
                     responseOk = true;
                 } else {

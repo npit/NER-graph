@@ -11,8 +11,8 @@ public class Methods {
 
     public final static int N_GRAMS = 0;
     public final static int WORD_GRAPHS = 1;
-    public final static int PLACEHOLDER = 2;
-    public final static int PLACEHOLDER_SS = 3;
+    public final static int PLACEHOLDER = 2; // replace non top / entity terms with a placeholder unit size word (eg "A")
+    public final static int PLACEHOLDER_SS = 3; // placeholder, but lenght of plchldr matches the length of the word in replaces
     public final static int RANDOM = 4;
     public final static int COSINE = 5;
     public final static int PLACEHOLDER_EXTRA_WEIGHT = 6;

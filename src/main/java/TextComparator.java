@@ -7,8 +7,7 @@ import utils.Percentage;
 import utils.VerySimpleFormatter;
 import utils.tf_idf.DocumentOptimizedParser;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -34,9 +33,13 @@ public class TextComparator {
     public static void main(String[] args) {
         long totalTimeStart = System.currentTimeMillis();
         TextComparator neg = new TextComparator();
+        if(args.length <1){
+            System.err.println("Need config file.");
+            return;
+        }
 
         try {
-            neg.start();
+            neg.start(args[0]);
         } catch (IOException e) {
             System.err.println("Problem writing log file");
         }
@@ -45,10 +48,18 @@ public class TextComparator {
         System.out.println("Total time: " + ((totalTimeEnd - totalTimeStart) / 1000.0) + " seconds");
     }
 
-    private void start() throws IOException {
+    private void start(String configfile) throws IOException {
         // Setup logger
         LOGGER.setLevel(Level.FINEST);
         LOGGER.setUseParentHandlers(false);
+
+        Properties props = new Properties();
+        try{
+            props.load(new FileReader(new File(configfile)));
+        }catch(IOException ex){
+            System.err.println(ex.getMessage());
+            return;
+        }
 
         // Add handlers to the logger
         Handler consoleHandler = new ConsoleHandler();
@@ -62,7 +73,13 @@ public class TextComparator {
         LOGGER.addHandler(fileHandler);
 
         // Main variables
-        String inputFolder = "texts/input";
+
+        //String inputFolder = "/home/nik/work/iit/entity-linking/database_to_text/mms";
+        //String inputFolder = "/home/nik/work/iit/entity-linking/database_to_text/mss";
+        // String inputFolder = "/home/nik/work/iit/entity-linking/doceng18_publication/project_folder/20newsgroups_datesorted/all_test/";
+        // String outputFolder = "/home/nik/work/iit/entity-linking/doceng18_publication/project_folder/20newsgroups_datesorted/all_test_er_data/";
+        String inputFolder = props.getProperty("input_folder");
+        String outputFolder = props.getProperty("output_folder");
 
         ArrayList<String> placeholders = new ArrayList<>();
 //        placeholders.add(".");
@@ -71,7 +88,8 @@ public class TextComparator {
         placeholders.add("A");
 
         File input = new File(inputFolder);
-        EntityExtractor entityExtractor = new OpenCalaisExtractor();
+        String key = props.getProperty("api_key");
+        EntityExtractor entityExtractor = new OpenCalaisExtractor(outputFolder, key);
         ArrayList<TextEntities> texts = new ArrayList<>();
         Map<String, GraphCache> graphs = new HashMap<>();
         ArrayList<String> errors = new ArrayList<>();
@@ -105,6 +123,20 @@ public class TextComparator {
                             TextEntities entities = entityExtractor.getEntities(file);
                             texts.add(entities);
 
+                            String outfile = outputFolder + "/" + file.getName();
+                            // store the entities in the outfile
+                            BufferedWriter bf = new BufferedWriter(new FileWriter(outfile));
+                            for(int ii=0;ii < entities.getEntities().size(); ++ii){
+                                ExtractedEntity ent = entities.getEntities().get(ii);
+                                StringBuilder sb = new StringBuilder();
+                                sb.append(ent.getName());sb.append(",");
+                                sb.append(ent.getType());sb.append(",");
+                                sb.append(ent.getOffset());sb.append(",");
+                                sb.append(ent.getLength());sb.append("\n");
+                                bf.write(sb.toString());
+                            }
+                            bf.close();
+
                             LOGGER.log(Level.FINE, "[main] Got " + entities.getEntities().size() + " extracted entities from " + file + "\n");
                         } else {
                             LOGGER.log(Level.FINE, "Skipping " + file.getAbsolutePath());
@@ -114,11 +146,16 @@ public class TextComparator {
                     }
                 }
             }
+            else throw new Exception("Need input folder.");
         } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e.getMessage());
             LOGGER.log(Level.SEVERE, Arrays.toString(e.getStackTrace()));
             LOGGER.log(Level.SEVERE, "Not comparing anything, there was an error");
             return;
         }
+        // just extract entities
+        System.out.println("Entity extraction done, bye!");
+        //if(true) return;
 
         // Calculate TF-IDF of documents, so we can keep top terms
         LOGGER.log(Level.INFO, "Calculating TF-IDF...");
@@ -208,10 +245,11 @@ public class TextComparator {
         }
 
         // Export to CSV
-        CSVExporter.exportCSV("out.csv", placeholders, comparisons);
+        CSVExporter.exportCSV(outputFolder + "/out.csv", placeholders, comparisons);
 
         System.out.println("TF-IDF time: " + ((tfIdfEnd - tfIdfStart) / 1000.0) + " seconds");
         System.out.println("Graph creation time: " + ((graphCalculationEnd - graphCalculationStart) / 1000.0) + " seconds");
         System.out.println("Comparisons time: " + ((comparisonsEnd - comparisonsStart) / 1000.0) + " seconds");
     }
+
 }
