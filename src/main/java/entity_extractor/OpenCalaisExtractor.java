@@ -37,8 +37,10 @@ public class OpenCalaisExtractor implements EntityExtractor {
         return this.currentApiKey;
     }
     private void advanceApiKey(){
+        LOGGER.log(Level.INFO,"Advancing api key from index/key:" + keyIdx + "/" + getCurrentApiKey());
         if (apiKeys.size() > keyIdx) ++keyIdx;
         else keyIdx = 0; // cycle
+        LOGGER.log(Level.INFO,"Advanced api key to index/key:" + keyIdx + "/" + getCurrentApiKey());
     }
     private final File output;
     private final HttpClient client;
