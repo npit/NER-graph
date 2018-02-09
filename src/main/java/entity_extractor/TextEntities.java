@@ -34,11 +34,10 @@ public class TextEntities {
     }
 
     public void setText(String text) {
-        // replace multiple whitespaces with a single one
         this.text = text
                 .replace("\n", " ")
                 .replace("\t", " ")
-            .replaceAll("[\\W&&[^\\s]]", " ").replaceAll("\s\s+"," ");
+            .replaceAll("[\\W&&[^\\s]]", " ");
     }
 
     public String getTitle() {

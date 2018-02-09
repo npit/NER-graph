@@ -88,8 +88,11 @@ public class TextComparator {
         placeholders.add("A");
 
         File input = new File(inputFolder);
-        String key = props.getProperty("api_key");
-        EntityExtractor entityExtractor = new OpenCalaisExtractor(outputFolder, key);
+        String key_str = props.getProperty("api_key");
+        ArrayList<String> keys = new ArrayList<>();
+        keys.addAll(Arrays.asList(key_str.split(",")));
+        EntityExtractor entityExtractor = new OpenCalaisExtractor(outputFolder);
+        entityExtractor.setApiKeys(keys);
         ArrayList<TextEntities> texts = new ArrayList<>();
         Map<String, GraphCache> graphs = new HashMap<>();
         ArrayList<String> errors = new ArrayList<>();

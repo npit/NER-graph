@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,7 +24,22 @@ public class OpenCalaisExtractor implements EntityExtractor {
     private static final int sleepTime = 500;
 
     private final Logger LOGGER = Logger.getLogger("NamedEntityGraph");
-    private final ArrayList<String> apiKeys;
+
+    public void setApiKeys(ArrayList<String> apiKeys) {
+        this.apiKeys = apiKeys;
+    }
+
+    private ArrayList<String> apiKeys;
+    int keyIdx;
+    private String currentApiKey;
+    private String getCurrentApiKey(){
+        this.currentApiKey = this.apiKeys.get(this.keyIdx);
+        return this.currentApiKey;
+    }
+    private void advanceApiKey(){
+        if (apiKeys.size() > keyIdx) ++keyIdx;
+        else keyIdx = 0; // cycle
+    }
     private final File output;
     private final HttpClient client;
 
@@ -33,20 +49,19 @@ public class OpenCalaisExtractor implements EntityExtractor {
         this.client.getParams().setParameter("http.useragent", "Calais Rest Client");
 
         // Setup api keys
-        apiKeys = new ArrayList<>();
-        apiKeys.add("api-key");
+        apiKeys = new ArrayList();
+        this.keyIdx = 0;
 
         // Setup cache/output folder
         this.output = new File(".");
     }
-    public OpenCalaisExtractor(String output_folder, String key) {
+    public OpenCalaisExtractor(String output_folder) {
         // Setup client
         this.client = new HttpClient();
         this.client.getParams().setParameter("http.useragent", "Calais Rest Client");
 
         // Setup api keys
         apiKeys = new ArrayList<>();
-        apiKeys.add(key.trim());
 
         // Setup cache/output folder
         this.output = new File(output_folder);
@@ -55,7 +70,7 @@ public class OpenCalaisExtractor implements EntityExtractor {
     private PostMethod createPostMethod() {
         PostMethod method = new PostMethod(CALAIS_URL);
 
-        method.setRequestHeader("X-AG-Access-Token", apiKeys.get(0));   // Set mandatory parameters
+        method.setRequestHeader("X-AG-Access-Token", getCurrentApiKey());   // Set mandatory parameters
         method.setRequestHeader("Content-Type", "text/raw");            // Set input content type
         method.setRequestHeader("outputformat", "application/json");    // Set response/output format
 
@@ -77,6 +92,9 @@ public class OpenCalaisExtractor implements EntityExtractor {
                 LOGGER.log(Level.SEVERE, "File post failed: " + file);
                 LOGGER.log(Level.SEVERE, "Got code: " + returnCode);
                 LOGGER.log(Level.SEVERE, "response: " + method.getResponseBodyAsString());
+                if(method.getResponseBodyAsString().toLowerCase().contains("exceeded the allowed quota of")){
+                    advanceApiKey();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -229,12 +247,36 @@ public class OpenCalaisExtractor implements EntityExtractor {
         return entities;
     }
 
+    private File preprocess_file(File file){
+        try{
+            StringBuilder sb = new StringBuilder();
+            BufferedReader rd = new BufferedReader(new FileReader(file));
+            String line;
+            while((line = rd.readLine()) != null){
+                // replace multiple spaces
+                line = line.replaceAll("\\s\\s+"," ");
+                sb.append(line);
+            }
+            rd.close();
+            File newfile = new File(file.getAbsolutePath() + ".tmp");
+            BufferedWriter bf = new BufferedWriter(new FileWriter(newfile));
+            bf.write(sb.toString());
+            bf.close();
+            return newfile;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     @Override
-    public TextEntities getEntities(File input) {
+    public TextEntities getEntities(File raw_input) {
         // Before making request to OpenCalais, check that the file does not already exist
-        String outputFilename = output.toString() + "/" + input.getName() + ".json";
+        String outputFilename = output.toString() + "/" + raw_input.getName() + ".json";
         File outfile = new File(outputFilename);
 
+        File input = this.preprocess_file(raw_input);
         String response = null;
         if (outfile.isFile() && enableCache) {
             LOGGER.log(Level.FINE, "[OpenCalaisExtractor] OpenCalais response is cached, using saved response...");
@@ -264,6 +306,8 @@ public class OpenCalaisExtractor implements EntityExtractor {
         TextEntities entities = getEntitiesFromOpenCalaisResponse(response);
         entities.setTitle(input.getName());
 
+        // delete the preprocessed file
+        input.delete();
         return entities;
     }
 }
